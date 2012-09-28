@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Vantage Point Solutions - Enterprise Portals & Web Content Management Consultancy</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+		<script type="text/javascript" src="./script/interpolationUtils.js"></script>
+		<script type="text/javascript" src="script/3dEngine.js"></script>
+		<script type="text/javascript" src="./script/objectManager.js"></script>
+		<script type="text/javascript" src="./script/objectFactory.js"></script>
+		<script type="text/javascript" src="./script/object.js"></script>
+		<script type="text/javascript" src="script/utilityTypes.js"></script>
+		<script type="text/javascript" src="./script/polygon.js"></script>
+		<script type="text/javascript" src="./script/transformationMatrix.js"></script>
+		<script type="text/javascript" src="./script/transformationFactory.js"></script>
+		<script type="text/javascript" src="./script/transition.js"></script>
+		<script type="text/javascript" src="./script/transitionState.js"></script>
+		<script type="text/javascript" src="./script/transitionManager.js"></script>
+		<script type="text/javascript" src="./script/navigationState.js"></script>
+		<script type="text/javascript" src="./script/navigationManager.js"></script>
+		
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"/></script>
+		
+		<link type="text/css" href="http://fonts.googleapis.com/css?family=Rokkitt:400,700" rel="stylesheet" >
+		<link type="text/css" href="./styles/styles.css"rel="stylesheet" media="screen" />
+		
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-28061467-1']);
+		  _gaq.push(['_trackPageview']);
+		
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		
+		</script>
+	</head>
+	<body>
+	
+		<div id="container">
+		
+
+			
+			<canvas id="canvas" height="800" width="1680">
+			
+			</canvas>
+			
+			<div id="innerContainer">
+				<img id="logo" src="./images/vantagePointSolutionsLogo.png">
+			
+				<div id="navBg">
+				
+				</div>
+				<div id="nav">
+					<a href="#" onclick="NavigationManager.changeState('home',true);">Home</a> |
+					<a href="#" onclick="NavigationManager.changeState('about',true);">About</a> |
+					<a href="#" onclick="NavigationManager.changeState('services',true);">Services</a> |
+					<a href="#" onclick="NavigationManager.changeState('clients',true);">Clients</a> |
+					<a href="#" onclick="NavigationManager.changeState('contacts',true);">Contact</a>
+				</div>
+						
+				
+			</div>
+			
+			<div id="innerContainer2">
+			
+	
+			
+				<div id="nextPage"><a href="#" onclick="NavigationManager.nextState(true);" title="Next Page"></a></div>
+				<div id="previousPage"><a href="#" onclick="NavigationManager.previousState(true);" title="Previous Page"></a></div>
+				
+				 <div id="footer">
+					&copy; Vantage Point Solutions Ltd 2011 | <a href="#" onclick="NavigationManager.changeState('accessibility',true);">Accessibility</a>
+				</div>
+			</div>
+			
+			
+			<div id="content">
+				<div id="home">
+					<h1>Home</h1>
+					<p>
+						<strong>vantage point solutions</strong> is a leading provider of enterprise portal and web content management consultancy and services.
+					</p>
+					<p>
+						Our clients recognise the value of these technologies  and understand that the right skills are necessary to maximise the return on their technology investment. 
+					</p>
+					<p>
+						We specialise in the deployment of solutions based on the <strong>IBM WebSphere Portal Server</strong> and <strong>Adobe CQ</strong> platforms, but understand the fundamental best practices and design patterns that facilitate the efficient delivery of portal and web content management solutions.
+					</p>
+				</div>
+				<div id="about">
+					<h1>About Vantage Point Solutions</h1>
+					<p><strong>vantage point solutions</strong> consultants have ten years experience delivering enterprise portal-based and web content management solutions to meet challenging client requirements.</p>
+					<p>Our consultants have worked closely with IBM and Adobe / Day to establish best-practices and processes for the sucessful delivery of solutions based on the <strong>Adobe CQ</strong>, <strong>IBM WebSphere Portal</strong> and <strong>IBM Web Content Management</strong> platforms.</p>
+					<p style="margin-bottom: 0px;">We believe in working closely with our clients to adapt and expand their development process to suit portal and web content management development.</p>
+				</div>
+				<div id="services">
+					<h1>Our Services</h1>
+					<p><strong>vantage point solutions</strong> offer the following services:</p>
+					<ul>
+						<li>
+							<strong>Technical Leadership</strong><br/>
+							We can provide leadership and/or mentoring in Adobe CQ, IBM WebSphere Portal Server, IBM Web Content Management, WebSphere Application Server and the Rational software development platform (RAD / RSA). Our consultants hold an array of IBM qualifications around the WebSphere product set and are all Sun Java certified. We can also provide expertise around EJB, JSP, WebServices, Java Server Faces, Hibernate, XML / XSLT, Ajax, accessible HTML / CSS Layout and other core areas.
+						</li>
+						<li>
+							<strong>Portal Management &amp; Governance</strong><br/>
+							Cross-department enterprise portals place unique demands on an IT organisation, yet the question of portal governance is often overlooked. Blackford Associates can help establishing executive sponsorship and putting appropriate teams in place to support a growing and agile enterprise portal.
+						</li>	
+					</ul>
+				</div>
+				<div id="clients">
+					<h1>Our Clients</h1>
+					<p>
+
+						<strong>vantage point solutions</strong> consultants have delivered successful WebSphere based solutions at blue-chip clients in the following industries:
+					</p>
+					<ul>
+						<li>investment & retail banking</li>
+						<li>telecoms</li>
+						<li>automotive</li>
+						<li>pharmaceutical</li>
+						<li>financial services</li>
+						<li>print & media</li>
+						<li>public sector & local government</li>
+					</ul>					
+					<p>
+
+						Please <a href="mailto:info@vantagepointsolutions.co.uk">contact us</a> for a full client list and references.
+
+					</p>
+
+				</div>
+				<div id="contacts">
+					<h1>Contact Us</h1>
+					<p>
+						<strong>information:</strong><br/>
+						<a href="mailto:info@vantagepointsolutions.co.uk">info@vantagepointsolutions.co.uk</a>
+					</p>
+					<p>
+						<strong>telephone:</strong><br/>
+						+44 (0)7854 602 284
+					</p>
+					<p>
+
+						<strong>address:</strong><br/>
+						22 commondale,<br/>
+						putney,<br/>
+						london,<br/>
+						sw15 1hs
+					</p>
+					<p>
+
+						Registered in England 7234443.
+					</p>
+				</div>
+				<div id="accessibility">
+					<h1>About this site</h1>
+					<p>and here is some content and here is some content and here is some content and here is some content and here is some content and here is some content </p>
+					<p>and here is some content and here is some content and here is some content and here is some content and here is some content and here is some content </p>
+				</div>
+			</div>
+		</div>
+		<script> 
+			var constants = [];
+			
+			// Make sure the canvas is centrally aligned in the page 
+			// This might require it to overflow the page (can't resize
+			// it as this will affect aspect ratio)
+			function centerCanvas(){
+				var canvasWidth = $('#canvas').width();
+				var canvasHeight = $('#canvas').height();
+				
+				var screenWidth =  $('body').width();
+				var screenHeight = $('body').height();
+				
+				var marginLeft = (screenWidth - canvasWidth) / 2;
+				var marginTop = (screenHeight - canvasHeight) / 2;
+				
+				if(marginTop>0) marginTop = 0;
+				if(marginTop<-100) marginTop = -100;
+				
+				document.getElementById("canvas").style.marginLeft = marginLeft+"px";
+				document.getElementById("canvas").style.marginTop = marginTop+"px";
+				
+				document.getElementById("innerContainer").style.marginLeft = (screenWidth/2-500)+"px";
+				
+				document.getElementById("innerContainer2").style.marginLeft = (screenWidth/2-500)+"px";
+				document.getElementById("innerContainer2").style.marginTop = marginTop+"px";
+				
+				document.getElementById("content").style.marginLeft = (screenWidth/2-230)+"px";
+				document.getElementById("content").style.marginTop = marginTop+"px";
+				
+			}
+			
+			function isCanvasSupported(){
+			  var elem = document.createElement('canvas');
+			  return !!(elem.getContext && elem.getContext('2d'));
+			}
+			
+			// If we don't have canvas - go to low-tech site
+			if(!isCanvasSupported()){
+				window.location.href = "http://www.vantagepointsolutions.co.uk/low.html";
+			}
+			
+			// Center the canvas to the initial window size
+			centerCanvas();
+			
+			// On any window resize, center the canvas again
+			$(window).resize(function(){centerCanvas();});
+			
+			// Start off the 3D engine
+			FreeDEngine.init();
+		</script>
+	</body>
+</html>
