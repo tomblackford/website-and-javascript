@@ -9,6 +9,7 @@ vps = vps || {};
  */
 vps.TransformationMatrix = function () {
 	// The internal representation of the matrix - start off with identity matrix
+	// This will be a no-op if applied to anything
 	this.values = [[1,0,0,0],
 				  [0,1,0,0],
 				  [0,0,1,0],

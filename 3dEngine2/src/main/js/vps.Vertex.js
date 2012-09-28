@@ -4,18 +4,18 @@
 vps = vps || {};
 
 /**
- * Construct a vertex at specifed position (in the object local coord system)
+ * Construct a vertex at specified position (in the object local coord system)
  * @param relX
  * @param relY
  * @param relZ
  */
 vps.Vertex = function(relX, relY, relZ){
-	this.relativePosition = new vps.Coord3d(relX, relY, relZ);
+	this.relativeCoords = new vps.Coord3d(relX, relY, relZ);
 	
 	// These will be calculated later
-	this.absolutePosition = new vps.Coord3d(0,0,0);	// The position of the vertex in absolute world coords
-	this.povPosition = new vps.Coord3d(0,0,0);		// The position of the vertex relative to view window
-	this.viewPosition = new vps.Coord2d(0,0);		// The position of the vertex on the 2d view plane
+	this.absoluteCoords = new vps.Coord3d(0,0,0);	// The position of the vertex in absolute world coords
+	this.povCoords = new vps.Coord3d(0,0,0);		// The position of the vertex relative to view window
+	this.viewCoords = new vps.Coord2d(0,0);			// The position of the vertex on the 2d view plane
 };
 
 /**
@@ -24,15 +24,34 @@ vps.Vertex = function(relX, relY, relZ){
  * @param worldPosition
  */
 vps.Vertex.prototype.updateAbsoluteCoords = function(transformationMatrix, worldPosition){
+	// Apply the local rotation first
+	transformationMatrix.apply(this.relativeCoords, this.absoluteCoords);
 	
-	
-	transformationMatrix.apply(this.relativePosition, this.absolutePosition);
-	
-	jstestdriver.console.log("Applied transformationMatrix : "+this.absolutePosition.x);
+	// Move to the correct world position
+	this.absoluteCoords.x += worldPosition.x;
+	this.absoluteCoords.y += worldPosition.y;
+	this.absoluteCoords.z += worldPosition.z;
 
-	this.absolutePosition.x += worldPosition.x;
-	this.absolutePosition.y += worldPosition.y;
-	this.absolutePosition.z += worldPosition.z;
+};
+
+/**
+ * Calculate the pov-relative coordinates of the vertex and return the distance between pov coords and camera
+ * @param transformationMatrix
+ * @param positionRelativeToView
+ */
+vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatrix, cameraPosition){
+
+	// Work out position with respect to the camera's coordinate system
+	var relativePos = new vps.Coord3d(this.absoluteCoords.x-cameraPosition.x,
+									  this.absoluteCoords.y-cameraPosition.y,
+									  this.absoluteCoords.z-cameraPosition.z);
 	
-	jstestdriver.console.log("After position applied: "+this.absolutePosition.x);
+	cameraRotationTransformationMatrix.apply(relativePos, this.povCoords);
+
+	// Work out the distance from camera to this point
+	xDist = relativePos.x - cameraPosition.x;
+	yDist = relativePos.y - cameraPosition.y;
+	zDist = relativePos.z - cameraPosition.z;
+	
+	return Math.sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
 };
