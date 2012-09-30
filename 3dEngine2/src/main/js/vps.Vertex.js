@@ -16,6 +16,8 @@ vps.Vertex = function(coords){
 	this.absoluteCoords = new vps.Coord3d(0,0,0);	// The position of the vertex in absolute world coords
 	this.povCoords = new vps.Coord3d(0,0,0);		// The position of the vertex relative to view window
 	this.viewCoords = new vps.Coord2d(0,0);			// The position of the vertex on the 2d view plane
+
+	this.distanceToCamera = -1;						// The direct distance from vertex to camera
 };
 
 /**
@@ -35,7 +37,7 @@ vps.Vertex.prototype.updateAbsoluteCoords = function(transformationMatrix, world
 };
 
 /**
- * Calculate the pov-relative coordinates of the vertex and return the distance between pov coords and camera
+ * Calculate the pov-relative coordinates of the vertex and the distance between pov coords and camera
  * @param transformationMatrix
  * @param positionRelativeToView
  */
@@ -52,8 +54,7 @@ vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatr
 	xDist = relativePos.x - cameraPosition.x;
 	yDist = relativePos.y - cameraPosition.y;
 	zDist = relativePos.z - cameraPosition.z;
-	
-	return Math.sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
+	this.distanceToCamera = Math.sqrt((xDist*xDist) + (yDist*yDist) + (zDist*zDist));
 };
 
 /**

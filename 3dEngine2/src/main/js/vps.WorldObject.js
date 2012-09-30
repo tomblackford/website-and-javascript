@@ -28,6 +28,9 @@ vps.WorldObject = function(name){
  */
 vps.WorldObject.prototype.addPolygon = function(polygon){
 	this.polygons[this.polygons.length] = polygon;
+	
+	// Add a reference back to the parent object
+	polygon.parentObject = this;
 };
 
 /**
@@ -36,6 +39,39 @@ vps.WorldObject.prototype.addPolygon = function(polygon){
  */
 vps.WorldObject.prototype.addVertex = function(vertex){
 	this.vertices[this.vertices.length] = vertex;
+};
+
+/**
+ * Add a new vertex with the passed coords to the object
+ * @param x
+ * @param y
+ * @param z
+ */
+vps.WorldObject.prototype.addVertexByCoords = function(x, y, z){
+	this.vertices[this.vertices.length] = new vps.Vertex(new vps.Coord3d(x,y,z));
+};
+
+/**
+ * Add a new 3-point poly to the object
+ */
+vps.WorldObject.prototype.addPolygon3 = function (v1, v2, v3, shade){
+	var newPoly = new vps.Polygon3(this.vertices[v1], this.vertices[v2], this.vertices[v3], shade);
+	this.polygons[this.polygons.length] = newPoly;
+	
+	// Add a reference back to the parent object
+	newPoly.parentObject = this;
+};
+
+/**
+ * Add a new 4-point poly to the object
+ */
+vps.WorldObject.prototype.addPolygon4 = function (v1, v2, v3, v4, shade){
+	
+	var newPoly = new vps.Polygon4(this.vertices[v1], this.vertices[v2], this.vertices[v3], this.vertices[v4], shade);
+	this.polygons[this.polygons.length] = newPoly;
+	
+	// Add a reference back to the parent object
+	newPoly.parentObject = this;
 };
 
 /**
@@ -52,22 +88,25 @@ vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, view
 	// Update every vertex's POV coords based on the camera's position
 	this.updatePovCoords(cameraRotationTransformation, cameraPosition);
 	
-	// Update every vertex's view coordinates based on the viewer position (relative to camera)
-	this.updateViewCoords(viewerPosition);
-	
-	// Work out whether each polygon needs to be rendered
-	for(var i=0; i<this.polygons.length; i++){
+	// We only need to do the rest if the object is visible (ie not behind viewer) 
+	if(this.visible){
+		// Update every vertex's view coordinates based on the viewer position (relative to camera)
+		this.updateViewCoords(viewerPosition);
 		
-		// Update the polygon's world position/rotation based on the object's latest position/rotation	
-		//this.polygons[i].updateAbsoluteCoords(worldRotationTransformation, this.position);
-		
-		// Update the polygon's POV coords based on the camera's position
-		//this.polygons[i].updatePovCoords(cameraRotationTransformation, cameraPosition);
-		
-		// Update the polygon's view coordinates based on the viewer position (relative to camera)
-		//this.polygons[i].updateViewCoords(viewerPosition);
-	}
-	
+		// Work out whether each polygon needs to be rendered
+		for(var i=0; i<this.polygons.length; i++){
+			var polyVisible = false;
+			
+			// Check that the polygon isn't too far away
+			polyVisible = this.polygons[i].isInsideViewDistance();			
+			if(polyVisible){		
+				// Confirm that the polygon is facing the viewport
+				polyVisible = this.polygons[i].isFacingViewport();
+			}
+			
+			this.polygons[i].visible = polyVisible;
+		};
+	};
 };
 
 /**
@@ -78,6 +117,7 @@ vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, view
 vps.WorldObject.prototype.updateAbsoluteCoords = function(rotationMatrix, position){
 	
 	for (var i=0; i<this.vertices.length; i++){
+		console.log(this.vertices[i]);
 		this.vertices[i].updateAbsoluteCoords(rotationMatrix, position);
 		// console.log("AbsoluteCoords["+i+"] = "+this.vertices[i].absoluteCoords.toString());
 	}
@@ -96,8 +136,7 @@ vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePos
 	// Loop through every point - updating the POV-relative coordinates
 	// Also update the distance to furthest / nearest point vars if required
 	for (var i=0; i<this.vertices.length; i++){
-		var distanceTo = this.vertices[i].updatePOVCoords(rotationMatrix, relativePosition);
-		//console.log("POVCoords["+i+"] = "+this.vertices[i].povCoords.toString());
+		this.vertices[i].updatePOVCoords(rotationMatrix, relativePosition);
 	}
 	
 	// Update the position matrix
@@ -107,7 +146,7 @@ vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePos
 	} else {
 		console.log('Object '+this.name+' is behind view plane. Skipping.');
 		this.visible = false;
-	}
+	};
 	
 };
 
@@ -115,26 +154,11 @@ vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePos
  * Update the view position of each of the vertices in this polygon
  * @param viewPosition
  */
-vps.WorldObject.prototype.updateViewCoords = function(viewPosition){
-	
-	if(this.visible){
-		for(var i=0; i<this.vertices.length; i++){
-			this.vertices[i].updateViewCoords(viewPosition);
-			//console.log("ViewCoords["+i+"] = "+this.vertices[i].viewCoords.toString());
-		}
-	}
-};
+vps.WorldObject.prototype.updateViewCoords = function(viewPosition){	
 
-/**
- * Temporary draw function
- * @param ctx
- */
-vps.WorldObject.prototype.draw = function(ctx){
+	for(var i=0; i<this.vertices.length; i++){
+		this.vertices[i].updateViewCoords(viewPosition);
+		//console.log("ViewCoords["+i+"] = "+this.vertices[i].viewCoords.toString());
+	};
 	
-	if(this.visible){
-		for(var i=0; i<this.polygons.length; i++){
-			// Draw the polygon
-			this.polygons[i].draw(ctx);
-		}
-	}
 };

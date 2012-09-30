@@ -3,9 +3,9 @@ vps = vps || {};
 /**
  * A polygon with 4 points
  */
-vps.Polygon4 = function(v1, v2, v3, v4){
+vps.Polygon4 = function(v1, v2, v3, v4, shade){
 	// Call parent constructor
-	vps.Polygon4.baseConstructor.call(this);
+	vps.Polygon4.baseConstructor.call(this, shade);
 	
 	this.addVertex(v1);
 	this.addVertex(v2);
