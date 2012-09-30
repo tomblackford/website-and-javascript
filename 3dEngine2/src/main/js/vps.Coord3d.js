@@ -12,3 +12,7 @@ vps.Coord3d = function(x, y, z){
 	this.y = y;
 	this.z = z;
 };
+
+vps.Coord3d.prototype.toString = function(){
+	return "Coord3d ("+this.x+", "+this.y+", "+this.z+")";
+};

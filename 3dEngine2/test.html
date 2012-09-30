@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="src/main/js/vps.Utils.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Coord2d.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Coord3d.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Rotation.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.TransformationMatrix.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.RotationTransformationMatrix.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.TranslationTransformationMatrix.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Polygon.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Vertex.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Polygon3.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Polygon4.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.ObjectManager.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.WorldObject.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.worldobjects.Cube.js"></script>
+	</head>
+	<body>
+		<canvas id="canvas" height="500" width="500" style="background-color: black;"></canvas>
+	
+		<script>
+			var canvas = document.querySelector('canvas');
+			var ctx = canvas.getContext('2d');
+			ctx.strokeStyle = "#ffffff";
+			ctx.lineCap = "butt";
+			ctx.lineJoin = "round";
+			
+			var objectManager = new vps.ObjectManager();
+			var cube1 = new vps.worldobjects.Cube();
+			cube1.rotation = new vps.Rotation(0,0,0);
+			cube1.position = new vps.Coord3d(0,0,400);
+			objectManager.addObject(cube1);
+			
+			var cameraPosition = new vps.Coord3d(000,-200,-1000);
+			var cameraRotation = new vps.Rotation(0,0,0);
+			
+			var viewerPosition = new vps.Coord3d(-20,0,0);
+			
+			objectManager.updateAll(cameraPosition, cameraRotation, viewerPosition);
+			objectManager.drawAll(ctx);
+			
+			var oneDegree = Math.PI/180;
+			
+			document.onkeyup=(function(e){
+				var key=(typeof event!='undefined')?window.event.keyCode:e.keyCode;
+	
+				console.log('Key pressed: '+key);
+				if(key==219){
+					cube1.rotation.y += oneDegree;
+				}
+				if(key==221){
+					cube1.rotation.y -= oneDegree;
+				}
+				if(key==61){
+					cube1.rotation.x += oneDegree;
+				}
+				if(key==220){
+					cube1.rotation.x -= oneDegree;
+				}
+				
+				if(key==39){
+					cameraRotation.y += oneDegree;
+				}
+				if(key==37){
+					cameraRotation.y -= oneDegree;
+				}
+				
+				if(key==38){
+					cameraPosition.z += 100;
+				}
+				if(key==40){
+					cameraPosition.z -= 100;
+				}
+				
+				
+				objectManager.updateAll(cameraPosition, cameraRotation, viewerPosition);
+				ctx.clearRect(0, 0, 500, 500);
+				objectManager.drawAll(ctx);
+			});
+		</script>
+		
+		
+			
+	</body>
+</html>

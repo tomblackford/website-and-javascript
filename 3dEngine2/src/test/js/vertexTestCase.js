@@ -2,7 +2,7 @@ VertexTestCase = TestCase("VertexTestCase");
 
 VertexTestCase.prototype.testAbsolutePositionMovementOnly = function() {
 
-	var test1 = new vps.Vertex(1,1,1);
+	var test1 = new vps.Vertex(new vps.Coord3d(1,1,1));
 	
 	var noRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0,0,0));
 	var worldPosition = new vps.Coord3d(-5,5,10);
@@ -17,7 +17,7 @@ VertexTestCase.prototype.testAbsolutePositionMovementOnly = function() {
 
 VertexTestCase.prototype.testAbsolutePositionRotationOnly = function() {
 
-	var test1 = new vps.Vertex(5,0,0);
+	var test1 = new vps.Vertex(new vps.Coord3d(5,0,0));
 	
 	var xRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0, Math.PI,0));
 	var worldPosition = new vps.Coord3d(0,0,0);
@@ -31,7 +31,7 @@ VertexTestCase.prototype.testAbsolutePositionRotationOnly = function() {
 
 VertexTestCase.prototype.testAbsolutePositionRotationAndMovement = function() {
 
-	var test1 = new vps.Vertex(5,0,0);
+	var test1 = new vps.Vertex(new vps.Coord3d(5,0,0));
 	
 	var xRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0, 0, Math.PI/2));
 	var worldPosition = new vps.Coord3d(0,0,4);
@@ -45,7 +45,7 @@ VertexTestCase.prototype.testAbsolutePositionRotationAndMovement = function() {
 
 VertexTestCase.prototype.testCameraTransformCameraMoved = function() {
 	
-	var test1 = new vps.Vertex(5,0,0);
+	var test1 = new vps.Vertex(new vps.Coord3d(5,0,0));
 	
 	// Transform the test vertex to 10,5,5 in absolute world coordinate system
 	var noRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0,0,0));
@@ -64,7 +64,7 @@ VertexTestCase.prototype.testCameraTransformCameraMoved = function() {
 
 VertexTestCase.prototype.testCameraTransformCameraRotated = function() {
 	
-	var test1 = new vps.Vertex(5,0,0);
+	var test1 = new vps.Vertex(new vps.Coord3d(5,0,0));
 	
 	// Transform the test vertex to 10,0,0 in absolute world coordinate system
 	var noRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0,0,0));
@@ -79,4 +79,43 @@ VertexTestCase.prototype.testCameraTransformCameraRotated = function() {
 	assertTrue("The x position is correct", test1.povCoords.x < 0.0001);
 	assertTrue("The y position is correct", test1.povCoords.y < 0.001);
 	assertEquals("The z position is correct", -10, test1.povCoords.z);
+};
+
+VertexTestCase.prototype.testCameraTransformCameraRotated = function() {
+	
+	var test1 = new vps.Vertex(new vps.Coord3d(5,0,0));
+	
+	// Transform the test vertex to 10,0,0 in absolute world coordinate system
+	var noRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0,0,0));
+	var worldPosition = new vps.Coord3d(5,0,0);
+	test1.updateAbsoluteCoords(noRotationTransformation, worldPosition);
+	
+	// Now update the camera relative coordinates of the vertex (based on camera at origin, rotated 90 degrees about y) 
+	var yRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0,Math.PI/2,0));
+	var cameraPosition = new vps.Coord3d(0,0,0);
+	test1.updatePOVCoords(yRotationTransformation, cameraPosition);
+	
+	assertTrue("The x position is correct", test1.povCoords.x < 0.0001);
+	assertTrue("The y position is correct", test1.povCoords.y < 0.001);
+	assertEquals("The z position is correct", -10, test1.povCoords.z);
+};
+
+
+VertexTestCase.prototype.testCameraTransformCameraRotatedAndMoved = function() {
+	
+	var test1 = new vps.Vertex(new vps.Coord3d(5,0,0));
+	
+	// Leave vertex at 5,0,0 in world space
+	var noRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0,0,0));
+	var worldPosition = new vps.Coord3d(0,0,0);
+	test1.updateAbsoluteCoords(noRotationTransformation, worldPosition);
+	
+	// Now update the camera relative coordinates of the vertex (based on camera at -2,4,2, rotated 45 degrees about y) 
+	var yRotationTransformation = new vps.RotationTransformationMatrix(new vps.Rotation(0,Math.PI/4,0));
+	var cameraPosition = new vps.Coord3d(-2,4,2);
+	test1.updatePOVCoords(yRotationTransformation, cameraPosition);
+	
+	assertEquals("The x position is correct", 3.5355339059327378, test1.povCoords.x);
+	assertEquals("The y position is correct", -4, test1.povCoords.y);
+	assertEquals("The z position is correct", -6.363961030678927, test1.povCoords.z);
 };

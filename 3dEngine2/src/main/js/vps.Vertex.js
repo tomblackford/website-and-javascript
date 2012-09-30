@@ -9,8 +9,8 @@ vps = vps || {};
  * @param relY
  * @param relZ
  */
-vps.Vertex = function(relX, relY, relZ){
-	this.relativeCoords = new vps.Coord3d(relX, relY, relZ);
+vps.Vertex = function(coords){
+	this.relativeCoords = coords;
 	
 	// These will be calculated later
 	this.absoluteCoords = new vps.Coord3d(0,0,0);	// The position of the vertex in absolute world coords
@@ -54,4 +54,18 @@ vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatr
 	zDist = relativePos.z - cameraPosition.z;
 	
 	return Math.sqrt(xDist*xDist + yDist*yDist + zDist*zDist);
+};
+
+/**
+ * Calculate the coordinates of the vertex as projected onto the 2d view plane (ie perspectve projection)
+ */
+vps.Vertex.prototype.updateViewCoords = function(viewerPostion){
+	
+	//this.viewCoords.x = (this.povCoords.x - viewerPosition.x) * (viewerPosition.z / this.povCoords.z);
+	//this.viewCoords.y = (this.povCoords.y - viewerPosition.y) * (viewerPosition.z / this.povCoords.z);
+	
+	var oneOverZ = 1/this.povCoords.z;
+	this.viewCoords.x = this.povCoords.x * 800 * oneOverZ + 250 ;
+	this.viewCoords.y = -this.povCoords.y * 800 * oneOverZ + 250 ;
+
 };
