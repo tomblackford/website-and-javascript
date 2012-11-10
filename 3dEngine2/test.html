@@ -7,6 +7,7 @@
 		<script type="text/javascript" src="src/main/js/vps.Rotation.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.TransformationMatrix.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.RotationTransformationMatrix.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.RotationTransformationFactory.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.TranslationTransformationMatrix.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Polygon.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Vertex.js"></script>
@@ -19,7 +20,7 @@
 	</head>
 	<body>
 		<canvas id="canvas" height="500" width="500" style="background-color: black;"></canvas>
-	
+		<textarea rows="5" cols="20" id="fps"></textarea>
 		<script>
 			var canvas = document.querySelector('canvas');
 			var ctx = canvas.getContext('2d');
@@ -27,21 +28,56 @@
 			ctx.lineCap = "butt";
 			ctx.lineJoin = "round";
 			
+			var oneDegree = Math.PI/180;	
 			var objectManager = new vps.ObjectManager();
-			var cube1 = new vps.worldobjects.Coriolis('cube1');
+			
+			for (var i=1000; i>0; i-=200){
+				for(var j=-800; j<800; j+=200){
+					for(var k=-800; k<800; k+=200){
+						var cube1 = new vps.worldobjects.Coriolis('coriolis_'+i+'_'+j+'_'+k);
+						cube1.rotation = new vps.Rotation(0,0,0);
+						cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
+						cube1.position = new vps.Coord3d(j,k,i);
+						objectManager.addObject(cube1);
+					}		
+				}
+			}
+			
+			var cube1 = new vps.worldobjects.Coriolis('coriolis');
 			cube1.rotation = new vps.Rotation(0,0,0);
-			cube1.position = new vps.Coord3d(0,0,00);
+			cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
+			cube1.position = new vps.Coord3d(0,0,0);
 			objectManager.addObject(cube1);
 			
 			var cameraPosition = new vps.Coord3d(0,0,-1000);
 			var cameraRotation = new vps.Rotation(0,0,0);
 			
-			var viewerPosition = new vps.Coord3d(-20,0,0);
+			var viewerPosition = new vps.Coord3d(-20,0,0);	
 			
-			objectManager.updateAll(cameraPosition, cameraRotation, viewerPosition);
-			objectManager.drawAll(ctx);
 			
-			var oneDegree = Math.PI/180;
+			// This is the body of the 'game loop'
+			var updateAndDraw = function () {
+
+				objectManager.updateAll(cameraPosition, cameraRotation, viewerPosition);
+				objectManager.drawAll(ctx);
+
+			};
+			
+			// Calculate FPS every second
+			var fpsOut = document.getElementById('fps');
+			setInterval(function(){
+			  
+				var fps = objectManager.fps.toFixed(1);
+				fpsOut.value = fps;
+			  
+			}, 2000); 
+			
+			// Update screen 30x per second
+			window.setInterval(function(){
+				ctx.clearRect(0, 0, 500, 500);
+				updateAndDraw();
+			},30);
+			
 			
 			document.onkeyup=(function(e){
 				var key=(typeof event!='undefined')?window.event.keyCode:e.keyCode;
@@ -73,13 +109,9 @@
 				}
 				
 				console.log('Camera position is '+cameraPosition);
-				
-				objectManager.updateAll(cameraPosition, cameraRotation, viewerPosition);
-				ctx.clearRect(0, 0, 500, 500);
-				console.log('Cleared screen');
-				objectManager.drawAll(ctx);
-				console.log('Drawn objects');
+
 			});
+			
 		</script>
 		
 		

@@ -13,9 +13,13 @@ vps.WorldObject = function(name){
 	this.polygons = [];
 	this.visible = false;
 	this.name = name;
-	
+
+	// Position and speed of the object
 	this.position = new vps.Coord3d(0,0,0);
 	this.rotation = new vps.Rotation(0,0,0);
+	
+	// Rotation speed
+	this.rotationSpeed = new vps.Rotation(0,0,0);
 	
 	// A point a origin of local coord system.
 	// We use this to determine if behind view plane
@@ -78,9 +82,22 @@ vps.WorldObject.prototype.addPolygon4 = function (v1, v2, v3, v4, shade){
  * Update each of the polygons world, pov and relative positions
  */
 vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, viewerPostion){
+	
+	// Update the object's rotation based on its rotation speed
+	this.rotation.x += this.rotationSpeed.x;
+	this.rotation.x = Math.round(this.rotation.x*100)/100;
+	
+	this.rotation.y += this.rotationSpeed.y;
+	this.rotation.y = Math.round(this.rotation.y*100)/100;
+	
+	this.rotation.z += this.rotationSpeed.z;
+	this.rotation.z = Math.round(this.rotation.z*100)/100;
+	
 	// Rotation transformations based on the camera position, rotation and viewer position
-	var worldRotationTransformation = new vps.RotationTransformationMatrix(this.rotation);
-	var cameraRotationTransformation = new vps.RotationTransformationMatrix(cameraRotation);
+	//var worldRotationTransformation = new vps.RotationTransformationMatrix(this.rotation);
+	//var cameraRotationTransformation = new vps.RotationTransformationMatrix(cameraRotation);
+	var worldRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(this.rotation);
+	var cameraRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(cameraRotation);
 	
 	// Update every vertex's world position/rotation based on the object's latest position/rotation	
 	this.updateAbsoluteCoords(worldRotationTransformation, this.position);
@@ -90,6 +107,7 @@ vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, view
 	
 	// We only need to do the rest if the object is visible (ie not behind viewer) 
 	if(this.visible){
+	
 		// Update every vertex's view coordinates based on the viewer position (relative to camera)
 		this.updateViewCoords(viewerPosition);
 		
@@ -98,15 +116,15 @@ vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, view
 			var polyVisible = false;
 			
 			// Check that the polygon isn't too far away
+			// Confirm that the polygon is facing the viewport
 			polyVisible = this.polygons[i].isInsideViewDistance();			
-			if(polyVisible){		
-				// Confirm that the polygon is facing the viewport
+			if(polyVisible){
 				polyVisible = this.polygons[i].isFacingViewport();
 			}
-			
+
 			this.polygons[i].visible = polyVisible;
 		};
-	};
+	} 
 };
 
 /**
@@ -117,7 +135,6 @@ vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, view
 vps.WorldObject.prototype.updateAbsoluteCoords = function(rotationMatrix, position){
 	
 	for (var i=0; i<this.vertices.length; i++){
-		console.log(this.vertices[i]);
 		this.vertices[i].updateAbsoluteCoords(rotationMatrix, position);
 		// console.log("AbsoluteCoords["+i+"] = "+this.vertices[i].absoluteCoords.toString());
 	}
@@ -139,12 +156,13 @@ vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePos
 		this.vertices[i].updatePOVCoords(rotationMatrix, relativePosition);
 	}
 	
-	// Update the position matrix
+	// Update the position vertex (helper for locating this object)
 	this.positionVertices.updatePOVCoords(rotationMatrix, relativePosition);
+	
+	// Determine if the object is behind the camera or not
 	if(this.positionVertices.povCoords.z>0){
 		this.visible = true;
 	} else {
-		console.log('Object '+this.name+' is behind view plane. Skipping.');
 		this.visible = false;
 	};
 	

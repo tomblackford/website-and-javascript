@@ -55,8 +55,6 @@ vps.Polygon.prototype.isInsideViewDistance = function(){
 		if(this.vertices[i].distanceToCamera > 50000){
 			answer = false;
 		}
-		
-		console.log('Distance to camera = '+this.vertices[i].distanceToCamera);
 	}
 	
 	return answer;
@@ -69,24 +67,20 @@ vps.Polygon.prototype.isInsideViewDistance = function(){
 vps.Polygon.prototype.draw = function(ctx){
 
 	if(this.visible){
-		//ctx.fillStyle = colour;
+		ctx.fillStyle = "blue";
 		ctx.lineWidth = 1;
 		ctx.beginPath();
 		ctx.moveTo(this.vertices[0].viewCoords.x,this.vertices[0].viewCoords.y);
 	
-		//console.log ('Starting draw at '+this.vertices[0].viewCoords.toString());
-		
 		for(var j=1; j<this.vertices.length; j++){
-			//console.log ('Drawing to '+j+' : '+this.vertices[j].viewCoords.toString());
 			ctx.lineTo(this.vertices[j].viewCoords.x, this.vertices[j].viewCoords.y);
 		}
 		
-		//console.log ('Closing draw at '+this.vertices[0].viewCoords.toString());
-	
 		// Join it back up to the start
 		ctx.lineTo(this.vertices[0].viewCoords.x, this.vertices[0].viewCoords.y);	
 		
 		ctx.closePath();
 		ctx.stroke();
+		ctx.fill();
 	}
 };

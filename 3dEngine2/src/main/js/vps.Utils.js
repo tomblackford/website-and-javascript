@@ -1,5 +1,8 @@
 var vps = vps || {};
 
+/**
+ * Singleton providing utility functions
+ */
 vps.Utils = function(){
 	
 	/**

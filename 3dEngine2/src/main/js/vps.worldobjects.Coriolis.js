@@ -4,11 +4,11 @@ vps.worldobjects = vps.worldobjects || {};
 /**
  * A Coriolis station (from Elite)
  */
-vps.worldobjects.Coriolis = function(name){
+vps.worldobjects.Coriolis = function(name, colour){
 	// Call parent constructor
-	vps.worldobjects.Cube.baseConstructor.call(this, name);
+	vps.worldobjects.Coriolis.baseConstructor.call(this, name);
 	
-	var shade = 'hsla(60,100%,100%,1.0)';
+	this.colour;
 	
 	// Some vertices for this object	
 	this.addVertexByCoords(-50,	71,	50);		// 0
@@ -25,20 +25,20 @@ vps.worldobjects.Coriolis = function(name){
 	this.addVertexByCoords(50,	-71,-50);		// 11		
 	
 	// Polygons from these vertices
-	this.addPolygon3(1,2,7,shade);
-	this.addPolygon3(3,4,2,shade);
-	this.addPolygon3(0,5,3,shade);
-	this.addPolygon3(6,0,1,shade);
-	this.addPolygon4(0,3,2,1,-shade);
-	this.addPolygon4(2,4,11,7,-shade);
-	this.addPolygon4(1,7,10,6,-shade);
-	this.addPolygon4(0,6,9,5,-shade);
-	this.addPolygon4(3,5,8,4,-shade);
-	this.addPolygon4(10,11,8,9,-shade);
-	this.addPolygon3(9,8,5,-shade);
-	this.addPolygon3(7,11,10,-shade);
-	this.addPolygon3(6,10,9,-shade);
-	this.addPolygon3(11,4,8,-shade);
+	this.addPolygon3(1,2,7,colour);
+	this.addPolygon3(3,4,2,colour);
+	this.addPolygon3(0,5,3,colour);
+	this.addPolygon3(6,0,1,colour);
+	this.addPolygon4(0,3,2,1,-colour);
+	this.addPolygon4(2,4,11,7,-colour);
+	this.addPolygon4(1,7,10,6,-colour);
+	this.addPolygon4(0,6,9,5,-colour);
+	this.addPolygon4(3,5,8,4,-colour);
+	this.addPolygon4(10,11,8,9,-colour);
+	this.addPolygon3(9,8,5,-colour);
+	this.addPolygon3(7,11,10,-colour);
+	this.addPolygon3(6,10,9,-colour);
+	this.addPolygon3(11,4,8,-colour);
 
 };
 

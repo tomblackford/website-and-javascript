@@ -2,6 +2,11 @@ vps = vps || {};
 
 vps.ObjectManager = function(){
 	this.objects = [];
+	
+	this.fps = 0;
+	this.lastUpdate = (new Date)*1 - 1;
+	this.fpsFilter = 50;
+	
 };
 
 vps.ObjectManager.prototype.addObject = function(newObject){
@@ -29,6 +34,11 @@ vps.ObjectManager.prototype.updateAll = function(cameraPosition, cameraRotation,
 	this.allPolygons.sort(function(p1, p2){
 		return p2.distanceToFurthestPoint - p1.distanceToFurthestPoint;
 	});
+
+	// Update the fps calculator
+	this.thisFrameFPS = 1000 / ((this.now=new Date) - this.lastUpdate);
+	this.fps += (this.thisFrameFPS - this.fps) / this.fpsFilter;
+	this.lastUpdate = this.now;
 };
 
 vps.ObjectManager.prototype.drawAll = function(ctx){
