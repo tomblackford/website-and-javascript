@@ -2,8 +2,10 @@
 <html>
 	<head>
 		<script type="text/javascript" src="src/main/js/vps.Utils.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.GeometryUtils.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Coord2d.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Coord3d.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Vector3d.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Rotation.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.TransformationMatrix.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.RotationTransformationMatrix.js"></script>
@@ -31,9 +33,9 @@
 			var oneDegree = Math.PI/180;	
 			var objectManager = new vps.ObjectManager();
 			
-			for (var i=1000; i>0; i-=200){
-				for(var j=-800; j<800; j+=200){
-					for(var k=-800; k<800; k+=200){
+			for (var i=-1600; i<1600; i+=800){
+				for(var j=-1600; j<1600; j+=800){
+					for(var k=-1600; k<1600; k+=800){
 						var cube1 = new vps.worldobjects.Coriolis('coriolis_'+i+'_'+j+'_'+k);
 						cube1.rotation = new vps.Rotation(0,0,0);
 						cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
@@ -43,12 +45,12 @@
 				}
 			}
 			
-			var cube1 = new vps.worldobjects.Coriolis('coriolis');
-			cube1.rotation = new vps.Rotation(0,0,0);
-			cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
-			cube1.position = new vps.Coord3d(0,0,0);
-			objectManager.addObject(cube1);
-			
+			//var cube1 = new vps.worldobjects.Cube('coriolis');
+			//cube1.rotation = new vps.Rotation(0,0,0);
+			//cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
+			//cube1.position = new vps.Coord3d(0,0,0);
+			//objectManager.addObject(cube1);
+
 			var cameraPosition = new vps.Coord3d(0,0,-1000);
 			var cameraRotation = new vps.Rotation(0,0,0);
 			
@@ -82,32 +84,29 @@
 			document.onkeyup=(function(e){
 				var key=(typeof event!='undefined')?window.event.keyCode:e.keyCode;
 	
-				console.log('Key pressed: '+key);
-				if(key==219){
-					cube1.rotation.y += oneDegree;
-				}
-				if(key==221){
-					cube1.rotation.y -= oneDegree;
-				}
-				if(key==61){
-					cube1.rotation.x += oneDegree;
-				}
-				if(key==220){
-					cube1.rotation.x -= oneDegree;
-				}	
+				// Turning left and right
 				if(key==39){
-					cameraRotation.y += oneDegree;
-				}
-				if(key==37){
 					cameraRotation.y -= oneDegree;
 				}
-				if(key==38){
-					cameraPosition.z += 100;
-				}
-				if(key==40){
-					cameraPosition.z -= 100;
+				if(key==37){
+					cameraRotation.y += oneDegree;
 				}
 				
+				// Looking up and down
+				if(key==38){
+					cameraRotation.x += oneDegree;
+				}
+				if(key==40){
+					cameraRotation.x -= oneDegree;
+				}
+				
+				// Move the camera in the direction it's facing
+				if(key==65){
+					vps.GeometryUtils.moveInFacingDirection(cameraPosition, cameraRotation, 100);		
+				}
+				if(key==90){
+					vps.GeometryUtils.moveInFacingDirection(cameraPosition, cameraRotation, -100);		
+				}
 				console.log('Camera position is '+cameraPosition);
 
 			});

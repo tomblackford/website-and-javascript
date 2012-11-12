@@ -9,8 +9,6 @@ vps.Polygon = function(colour){
 	this.distanceToFurthestPoint = 0;
 	this.distanceToClosestPoint = Number.POSITIVE_INFINITY;
 	this.colour = colour;
-	
-	console.log('Creating new polygon with colour '+colour);
 };
 
 /**
@@ -60,6 +58,29 @@ vps.Polygon.prototype.isInsideViewDistance = function(){
 	return answer;
 };
 
+vps.Polygon.prototype.getNormal = function(){
+	
+	var vector1 = vps.GeometryUtils.createVector3d(this.vertices[0].absoluteCoords,this.vertices[1].absoluteCoords);
+	var vector2 = vps.GeometryUtils.createVector3d(this.vertices[1].absoluteCoords,this.vertices[2].absoluteCoords);
+	
+	var answer = vector1.crossProduct(vector2);
+	answer.normalise();
+	
+	return answer;
+};
+
+vps.Polygon.prototype.getBrightness = function(){
+	var ambient = 0.3;
+	
+	// temp light direction along Z axis
+	var lightVector = new vps.Vector3d(0,0,1);
+	
+	// the raw brightness, 
+	var rawColouring = ambient + (lightVector.dotProduct(this.getNormal())) / (1/ambient);
+	return rawColouring;
+	
+};
+
 /**
  * Temporary draw method (will be factored out into some kinda renderer class)
  * @param ctx
@@ -67,8 +88,11 @@ vps.Polygon.prototype.isInsideViewDistance = function(){
 vps.Polygon.prototype.draw = function(ctx){
 
 	if(this.visible){
-		ctx.fillStyle = "blue";
-		ctx.lineWidth = 1;
+		var brightness = this.getBrightness();
+		console.log(brightness);
+		ctx.fillStyle = 'hsl(240,100%, '+(100*brightness)+'%)';
+		
+		//ctx.lineWidth = 1;
 		ctx.beginPath();
 		ctx.moveTo(this.vertices[0].viewCoords.x,this.vertices[0].viewCoords.y);
 	
@@ -80,7 +104,7 @@ vps.Polygon.prototype.draw = function(ctx){
 		ctx.lineTo(this.vertices[0].viewCoords.x, this.vertices[0].viewCoords.y);	
 		
 		ctx.closePath();
-		ctx.stroke();
+		//ctx.stroke();
 		ctx.fill();
 	}
 };

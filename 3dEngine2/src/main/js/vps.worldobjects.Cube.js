@@ -22,11 +22,11 @@ vps.worldobjects.Cube = function(name){
 	this.addVertexByCoords(-sp,  sp, -sp);		// 7
 	
 	this.addPolygon4(0, 4, 5, 1, shade);
-	this.addPolygon4(7, 3, 2, 6, shade);
-	this.addPolygon4(0, 1, 2, 3, shade);
-	this.addPolygon4(1, 5, 6, 2, shade);
-	this.addPolygon4(4, 0, 3, 7, shade);
-	this.addPolygon4(5, 4, 7, 6, shade);
+	//this.addPolygon4(7, 3, 2, 6, shade);
+	//this.addPolygon4(0, 1, 2, 3, shade);
+	//this.addPolygon4(1, 5, 6, 2, shade);
+	//this.addPolygon4(4, 0, 3, 7, shade);
+	//this.addPolygon4(5, 4, 7, 6, shade);
 
 };
 

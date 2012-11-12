@@ -94,8 +94,6 @@ vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, view
 	this.rotation.z = Math.round(this.rotation.z*100)/100;
 	
 	// Rotation transformations based on the camera position, rotation and viewer position
-	//var worldRotationTransformation = new vps.RotationTransformationMatrix(this.rotation);
-	//var cameraRotationTransformation = new vps.RotationTransformationMatrix(cameraRotation);
 	var worldRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(this.rotation);
 	var cameraRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(cameraRotation);
 	
