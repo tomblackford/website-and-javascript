@@ -1,4 +1,5 @@
 /**
+
  * Represents a single point within a polygon
  */
 vps = vps || {};
@@ -58,8 +59,8 @@ vps.WorldObject.prototype.addVertexByCoords = function(x, y, z){
 /**
  * Add a new 3-point poly to the object
  */
-vps.WorldObject.prototype.addPolygon3 = function (v1, v2, v3, shade){
-	var newPoly = new vps.Polygon3(this.vertices[v1], this.vertices[v2], this.vertices[v3], shade);
+vps.WorldObject.prototype.addPolygon3 = function (v1, v2, v3, hue, reflectivity){
+	var newPoly = new vps.Polygon3(this.vertices[v1], this.vertices[v2], this.vertices[v3], hue, reflectivity);
 	this.polygons[this.polygons.length] = newPoly;
 	
 	// Add a reference back to the parent object
@@ -69,9 +70,9 @@ vps.WorldObject.prototype.addPolygon3 = function (v1, v2, v3, shade){
 /**
  * Add a new 4-point poly to the object
  */
-vps.WorldObject.prototype.addPolygon4 = function (v1, v2, v3, v4, shade){
+vps.WorldObject.prototype.addPolygon4 = function (v1, v2, v3, v4, hue, reflectivity){
 	
-	var newPoly = new vps.Polygon4(this.vertices[v1], this.vertices[v2], this.vertices[v3], this.vertices[v4], shade);
+	var newPoly = new vps.Polygon4(this.vertices[v1], this.vertices[v2], this.vertices[v3], this.vertices[v4], hue, reflectivity);
 	this.polygons[this.polygons.length] = newPoly;
 	
 	// Add a reference back to the parent object

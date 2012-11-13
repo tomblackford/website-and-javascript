@@ -3,12 +3,13 @@ vps = vps || {};
  * Represents a polygon, consisting of vertices
  * @returns {vps.Polygon}
  */
-vps.Polygon = function(colour){
+vps.Polygon = function(hue, reflectivity){
 	this.vertices = [];
 	this.visible = false;
 	this.distanceToFurthestPoint = 0;
 	this.distanceToClosestPoint = Number.POSITIVE_INFINITY;
-	this.colour = colour;
+	this.hue = hue;
+	this.reflectivity = reflectivity;
 };
 
 /**
@@ -70,7 +71,7 @@ vps.Polygon.prototype.getNormal = function(){
 };
 
 vps.Polygon.prototype.getBrightness = function(){
-	var ambient = 0.3;
+	var ambient = 0.35;
 	
 	// temp light direction along Z axis
 	var lightVector = new vps.Vector3d(0,0,1);
@@ -88,11 +89,13 @@ vps.Polygon.prototype.getBrightness = function(){
 vps.Polygon.prototype.draw = function(ctx){
 
 	if(this.visible){
-		var brightness = this.getBrightness();
-		console.log(brightness);
-		ctx.fillStyle = 'hsl(240,100%, '+(100*brightness)+'%)';
+	
+		// TODO - Factor shader out to the SceneRenderer 
+		var lightVector = new vps.Vector3d(-1, -1, 0);
+		var shader = new vps.FlatShader(lightVector, 0.5);
+		ctx.fillStyle = shader.shade(this);
 		
-		//ctx.lineWidth = 1;
+		ctx.lineWidth = 1;
 		ctx.beginPath();
 		ctx.moveTo(this.vertices[0].viewCoords.x,this.vertices[0].viewCoords.y);
 	

@@ -16,6 +16,8 @@
 		<script type="text/javascript" src="src/main/js/vps.Polygon3.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Polygon4.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.ObjectManager.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Camera.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.FlatShader.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.WorldObject.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.worldobjects.Cube.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.worldobjects.Coriolis.js"></script>
@@ -33,28 +35,53 @@
 			var oneDegree = Math.PI/180;	
 			var objectManager = new vps.ObjectManager();
 			
-			for (var i=-1600; i<1600; i+=800){
-				for(var j=-1600; j<1600; j+=800){
-					for(var k=-1600; k<1600; k+=800){
-						var cube1 = new vps.worldobjects.Coriolis('coriolis_'+i+'_'+j+'_'+k);
+			var hue = 0;
+			var count = 0;
+			
+			for (var i=-800; i<800; i+=400){
+			
+				hue = 0;
+				
+				for(var j=-800; j<800; j+=400){
+					
+					for(var k=-800; k<800; k+=400){
+						var cube1 = new vps.worldobjects.Coriolis('coriolis_'+i+'_'+j+'_'+k, hue, 0.5);
 						cube1.rotation = new vps.Rotation(0,0,0);
-						cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
+						
+						if(count % 2 == 0){
+							cube1.rotationSpeed = new vps.Rotation(oneDegree, oneDegree, oneDegree);
+						} else {
+							cube1.rotationSpeed = new vps.Rotation(-oneDegree, -oneDegree, -oneDegree);
+						}
+						
 						cube1.position = new vps.Coord3d(j,k,i);
 						objectManager.addObject(cube1);
-					}		
+						
+						hue+=20;
+						++count;
+					}
+					
+					hue+=20;
 				}
+				
+				hue+=20;
+				++count;
 			}
 			
-			//var cube1 = new vps.worldobjects.Cube('coriolis');
-			//cube1.rotation = new vps.Rotation(0,0,0);
-			//cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
-			//cube1.position = new vps.Coord3d(0,0,0);
-			//objectManager.addObject(cube1);
+			var cube1 = new vps.worldobjects.Cube('coriolis', 120, 0.5);
+			cube1.rotation = new vps.Rotation(0,0,0);
+			cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
+			cube1.position = new vps.Coord3d(0,0,0);
+			objectManager.addObject(cube1);
 
-			var cameraPosition = new vps.Coord3d(0,0,-1000);
-			var cameraRotation = new vps.Rotation(0,0,0);
+			// A camera object
+			var cameraPosition = new vps.Coord3d(0,0,-1000);	// A bit back from origin
+			var cameraRotation = new vps.Rotation(0,0,0);		// Along Z axis
+			var viewerPosition = new vps.Coord3d(-20,0,0);		// A bit back from cameraposition
+			var camera = new vps.Camera (cameraPosition, cameraRotation, viewerPosition);
 			
-			var viewerPosition = new vps.Coord3d(-20,0,0);	
+			// A scene renderer
+			var sc
 			
 			
 			// This is the body of the 'game loop'
