@@ -82,7 +82,7 @@ vps.WorldObject.prototype.addPolygon4 = function (v1, v2, v3, v4, hue, reflectiv
 /**
  * Update each of the polygons world, pov and relative positions
  */
-vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, viewerPostion){
+vps.WorldObject.prototype.update = function(camera){
 	
 	// Update the object's rotation based on its rotation speed
 	this.rotation.x += this.rotationSpeed.x;
@@ -96,19 +96,19 @@ vps.WorldObject.prototype.update = function(cameraPosition, cameraRotation, view
 	
 	// Rotation transformations based on the camera position, rotation and viewer position
 	var worldRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(this.rotation);
-	var cameraRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(cameraRotation);
+	var cameraRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(camera.rotation);
 	
 	// Update every vertex's world position/rotation based on the object's latest position/rotation	
 	this.updateAbsoluteCoords(worldRotationTransformation, this.position);
 	
 	// Update every vertex's POV coords based on the camera's position
-	this.updatePovCoords(cameraRotationTransformation, cameraPosition);
+	this.updatePovCoords(cameraRotationTransformation, camera.position);
 	
 	// We only need to do the rest if the object is visible (ie not behind viewer) 
 	if(this.visible){
 	
 		// Update every vertex's view coordinates based on the viewer position (relative to camera)
-		this.updateViewCoords(viewerPosition);
+		this.updateViewCoords(camera.viewerPosition);
 		
 		// Work out whether each polygon needs to be rendered
 		for(var i=0; i<this.polygons.length; i++){
@@ -135,7 +135,6 @@ vps.WorldObject.prototype.updateAbsoluteCoords = function(rotationMatrix, positi
 	
 	for (var i=0; i<this.vertices.length; i++){
 		this.vertices[i].updateAbsoluteCoords(rotationMatrix, position);
-		// console.log("AbsoluteCoords["+i+"] = "+this.vertices[i].absoluteCoords.toString());
 	}
 	
 	// Update the position vertices (but use a noop transformation matrix as rotation is no needed)
@@ -175,7 +174,6 @@ vps.WorldObject.prototype.updateViewCoords = function(viewPosition){
 
 	for(var i=0; i<this.vertices.length; i++){
 		this.vertices[i].updateViewCoords(viewPosition);
-		//console.log("ViewCoords["+i+"] = "+this.vertices[i].viewCoords.toString());
 	};
 	
 };

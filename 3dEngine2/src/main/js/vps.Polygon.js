@@ -81,33 +81,3 @@ vps.Polygon.prototype.getBrightness = function(){
 	return rawColouring;
 	
 };
-
-/**
- * Temporary draw method (will be factored out into some kinda renderer class)
- * @param ctx
- */
-vps.Polygon.prototype.draw = function(ctx){
-
-	if(this.visible){
-	
-		// TODO - Factor shader out to the SceneRenderer 
-		var lightVector = new vps.Vector3d(-1, -1, 0);
-		var shader = new vps.FlatShader(lightVector, 0.5);
-		ctx.fillStyle = shader.shade(this);
-		
-		ctx.lineWidth = 1;
-		ctx.beginPath();
-		ctx.moveTo(this.vertices[0].viewCoords.x,this.vertices[0].viewCoords.y);
-	
-		for(var j=1; j<this.vertices.length; j++){
-			ctx.lineTo(this.vertices[j].viewCoords.x, this.vertices[j].viewCoords.y);
-		}
-		
-		// Join it back up to the start
-		ctx.lineTo(this.vertices[0].viewCoords.x, this.vertices[0].viewCoords.y);	
-		
-		ctx.closePath();
-		//ctx.stroke();
-		ctx.fill();
-	}
-};

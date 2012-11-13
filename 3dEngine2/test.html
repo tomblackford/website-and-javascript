@@ -18,13 +18,80 @@
 		<script type="text/javascript" src="src/main/js/vps.ObjectManager.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Camera.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.FlatShader.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.SceneRenderer.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.WorldObject.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.worldobjects.Cube.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.worldobjects.Coriolis.js"></script>
 	</head>
 	<body>
 		<canvas id="canvas" height="500" width="500" style="background-color: black;"></canvas>
-		<textarea rows="5" cols="20" id="fps"></textarea>
+		
+		<div style="float:right;">
+			<table>
+				<tr>
+					<th>Rotate Camera :</th>
+					<td>
+						arrow keys
+					</td>
+				</tr>
+				<tr>
+					<th>Move forward / backwards :</th>
+					<td>
+						a / z
+					</td>
+				</tr>
+				<tr>
+					<th>Light Direction :</th>
+					<td>
+						1 to 9
+					</td>
+				</tr>
+				<tr>
+					<th>Ambient Light increase / decrease :</th>
+					<td>
+						+ / -
+					</td>
+				</tr>
+			</table>
+		</div>
+		<style>
+			th {
+				text-align: right;
+			}
+		</style>
+		<table>
+			<tr>
+				<th>Frames / second :</th>
+				<td>
+					<div id="fps"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>Camera Position :</th>
+				<td>
+					<div id="cameraPosition"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>Camera Rotation :</th>
+				<td>
+					<div id="cameraRotation"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>Light Direction :</th>
+				<td>
+					<div id="lightVector"></div>
+				</td>
+			</tr>
+			<tr>
+				<th>Ambient Light :</th>
+				<td>
+					<div id="ambientLight"></div>
+				</td>
+			</tr>
+		</table>
+		
 		<script>
 			var canvas = document.querySelector('canvas');
 			var ctx = canvas.getContext('2d');
@@ -35,6 +102,7 @@
 			var oneDegree = Math.PI/180;	
 			var objectManager = new vps.ObjectManager();
 			
+			// Create an array of objects
 			var hue = 0;
 			var count = 0;
 			
@@ -68,11 +136,11 @@
 				++count;
 			}
 			
-			var cube1 = new vps.worldobjects.Cube('coriolis', 120, 0.5);
-			cube1.rotation = new vps.Rotation(0,0,0);
-			cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
-			cube1.position = new vps.Coord3d(0,0,0);
-			objectManager.addObject(cube1);
+			//var cube1 = new vps.worldobjects.Cube('coriolis', 120, 0.5);
+			//cube1.rotation = new vps.Rotation(0,0,0);
+			//cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
+			//cube1.position = new vps.Coord3d(0,0,0);
+			//objectManager.addObject(cube1);
 
 			// A camera object
 			var cameraPosition = new vps.Coord3d(0,0,-1000);	// A bit back from origin
@@ -80,24 +148,39 @@
 			var viewerPosition = new vps.Coord3d(-20,0,0);		// A bit back from cameraposition
 			var camera = new vps.Camera (cameraPosition, cameraRotation, viewerPosition);
 			
-			// A scene renderer
-			var sc
+			// A shader
+			var lightVector = new vps.Vector3d(-1, -1, 0);
+			var ambientLight = 0.5;
+			var shader = new vps.FlatShader(lightVector, ambientLight);
 			
+			// A scene renderer
+			var sceneRenderer = new vps.SceneRenderer(ctx, camera, shader);
 			
 			// This is the body of the 'game loop'
 			var updateAndDraw = function () {
 
-				objectManager.updateAll(cameraPosition, cameraRotation, viewerPosition);
-				objectManager.drawAll(ctx);
+				objectManager.updateAll(camera);
+				objectManager.drawAll(sceneRenderer);
 
 			};
 			
-			// Calculate FPS every second
+			// Elements for debug readout
 			var fpsOut = document.getElementById('fps');
+			var cameraPositionOut = document.getElementById('cameraPosition');
+			var cameraRotationOut = document.getElementById('cameraRotation');
+			var lightVectorOut = document.getElementById('lightVector');
+			var ambientLightOut = document.getElementById('ambientLight');
+			
+			cameraRotationOut.innerHTML = cameraRotation.toString();
+			cameraPositionOut.innerHTML = cameraPosition.toString();
+			lightVectorOut.innerHTML = lightVector.toString();
+			ambientLightOut.innerHTML = ambientLight;
+			
+			// Calculate FPS every second
 			setInterval(function(){
 			  
 				var fps = objectManager.fps.toFixed(1);
-				fpsOut.value = fps;
+				fpsOut.innerHTML = fps;
 			  
 			}, 2000); 
 			
@@ -114,27 +197,79 @@
 				// Turning left and right
 				if(key==39){
 					cameraRotation.y -= oneDegree;
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				if(key==37){
 					cameraRotation.y += oneDegree;
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				
 				// Looking up and down
 				if(key==38){
 					cameraRotation.x += oneDegree;
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				if(key==40){
 					cameraRotation.x -= oneDegree;
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				
 				// Move the camera in the direction it's facing
 				if(key==65){
-					vps.GeometryUtils.moveInFacingDirection(cameraPosition, cameraRotation, 100);		
+					vps.GeometryUtils.moveInFacingDirection(cameraPosition, cameraRotation, 100);
+					cameraPositionOut.innerHTML = cameraPosition.toString();
 				}
 				if(key==90){
-					vps.GeometryUtils.moveInFacingDirection(cameraPosition, cameraRotation, -100);		
+					vps.GeometryUtils.moveInFacingDirection(cameraPosition, cameraRotation, -100);
+					cameraPositionOut.innerHTML = cameraPosition.toString();
 				}
-				console.log('Camera position is '+cameraPosition);
+				
+				// Change lighting direction
+				if(key==49){
+					shader.lightVector = new vps.Vector3d(0, 0, 1);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				if(key==50){
+					shader.lightVector = new vps.Vector3d(0, 1, 0);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				if(key==51){
+					shader.lightVector = new vps.Vector3d(1, 0, 0);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				if(key==52){
+					shader.lightVector = new vps.Vector3d(1, 0, 1);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				if(key==53){
+					shader.lightVector = new vps.Vector3d(1, 1, 1);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				if(key==54){
+					shader.lightVector = new vps.Vector3d(-1, -1, 1);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				if(key==55){
+					shader.lightVector = new vps.Vector3d(-1, -1, 1);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				if(key==56){
+					shader.lightVector = new vps.Vector3d(1, 0, -1);
+					lightVectorOut.innerHTML = shader.lightVector.toString();
+				}
+				
+				
+				// Change the ambient light level
+				if(key==173){
+					shader.ambientLight -= 0.1;
+					ambientLightOut.innerHTML = shader.ambientLight;
+				}
+				if(key==61){
+					shader.ambientLight += 0.1;
+					ambientLightOut.innerHTML = shader.ambientLight;
+				}
+				
+				// console.log(key);
 
 			});
 			

@@ -13,11 +13,11 @@ vps.ObjectManager.prototype.addObject = function(newObject){
 	this.objects[this.objects.length] = newObject;
 };
 
-vps.ObjectManager.prototype.updateAll = function(cameraPosition, cameraRotation, viewerPostion){
+vps.ObjectManager.prototype.updateAll = function(camera){
 	
 	for(var i=0; i<this.objects.length; i++){
 		// console.log('Updating object '+i);
-		this.objects[i].update(cameraPosition, cameraRotation, viewerPosition);
+		this.objects[i].update(camera);
 	
 	}
 
@@ -41,12 +41,13 @@ vps.ObjectManager.prototype.updateAll = function(cameraPosition, cameraRotation,
 	this.lastUpdate = this.now;
 };
 
-vps.ObjectManager.prototype.drawAll = function(ctx){
+vps.ObjectManager.prototype.drawAll = function(sceneRenderer){
 
 	// Draw them in the right order
 	for(var k=0; k<this.allPolygons.length; k++){
 		if(this.allPolygons[k].parentObject.visible){
-			this.allPolygons[k].draw(ctx);
+			//this.allPolygons[k].draw(ctx);
+			sceneRenderer.draw(this.allPolygons[k]);
 		}
 	}
 };
