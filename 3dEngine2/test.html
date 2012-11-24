@@ -106,13 +106,11 @@
 			var hue = 0;
 			var count = 0;
 			
-			for (var i=-800; i<800; i+=400){
-			
-				hue = 0;
-				
-				for(var j=-800; j<800; j+=400){
+			for (var i=-800; i<=800; i+=400){
+				hue = 0;			
+				for(var j=-800; j<=800; j+=400){
 					
-					for(var k=-800; k<800; k+=400){
+					for(var k=-800; k<=800; k+=400){
 						var cube1 = new vps.worldobjects.Coriolis('coriolis_'+i+'_'+j+'_'+k, hue, 0.5);
 						cube1.rotation = new vps.Rotation(0,0,0);
 						
@@ -128,7 +126,7 @@
 						hue+=20;
 						++count;
 					}
-					
+					++count;
 					hue+=20;
 				}
 				
@@ -143,8 +141,8 @@
 			//objectManager.addObject(cube1);
 
 			// A camera object
-			var cameraPosition = new vps.Coord3d(0,0,-1000);	// A bit back from origin
-			var cameraRotation = new vps.Rotation(0,0,0);		// Along Z axis
+			var cameraPosition = new vps.Coord3d(0,0,+4000);	// A bit back from origin
+			var cameraRotation = new vps.Rotation(0,180*oneDegree,0);		// Along Z axis
 			var viewerPosition = new vps.Coord3d(-20,0,0);		// A bit back from cameraposition
 			var camera = new vps.Camera (cameraPosition, cameraRotation, viewerPosition);
 			
@@ -197,6 +195,14 @@
 				// Turning left and right
 				if(key==39){
 					cameraRotation.y -= oneDegree;
+					cameraRotationOut.innerHTML = cameraRotation.toString();
+				}
+				if(key==188){
+					cameraRotation.y -= 90*oneDegree;
+					cameraRotationOut.innerHTML = cameraRotation.toString();
+				}
+				if(key==190){
+					cameraRotation.y += 90*oneDegree;
 					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				if(key==37){
@@ -269,7 +275,7 @@
 					ambientLightOut.innerHTML = shader.ambientLight;
 				}
 				
-				// console.log(key);
+				console.log(key);
 
 			});
 			

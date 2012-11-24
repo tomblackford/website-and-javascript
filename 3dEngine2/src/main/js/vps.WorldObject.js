@@ -84,6 +84,11 @@ vps.WorldObject.prototype.addPolygon4 = function (v1, v2, v3, v4, hue, reflectiv
  */
 vps.WorldObject.prototype.update = function(camera){
 	
+	// Clear any cached distances from each polygon
+	for(var i=0; i<this.polygons.length; i++){
+		this.polygons[i].clearDistances();
+	}
+	
 	// Update the object's rotation based on its rotation speed
 	this.rotation.x += this.rotationSpeed.x;
 	this.rotation.x = Math.round(this.rotation.x*100)/100;
@@ -102,7 +107,7 @@ vps.WorldObject.prototype.update = function(camera){
 	this.updateAbsoluteCoords(worldRotationTransformation, this.position);
 	
 	// Update every vertex's POV coords based on the camera's position
-	this.updatePovCoords(cameraRotationTransformation, camera.position);
+	this.updatePovCoords(cameraRotationTransformation, camera.position, camera.rotation);
 	
 	// We only need to do the rest if the object is visible (ie not behind viewer) 
 	if(this.visible){
@@ -111,17 +116,8 @@ vps.WorldObject.prototype.update = function(camera){
 		this.updateViewCoords(camera.viewerPosition);
 		
 		// Work out whether each polygon needs to be rendered
-		for(var i=0; i<this.polygons.length; i++){
-			var polyVisible = false;
-			
-			// Check that the polygon isn't too far away
-			// Confirm that the polygon is facing the viewport
-			polyVisible = this.polygons[i].isInsideViewDistance();			
-			if(polyVisible){
-				polyVisible = this.polygons[i].isFacingViewport();
-			}
-
-			this.polygons[i].visible = polyVisible;
+		for(var i=0; i<this.polygons.length; i++){		
+			this.polygons[i].updateVisibility();
 		};
 	} 
 };
@@ -146,16 +142,16 @@ vps.WorldObject.prototype.updateAbsoluteCoords = function(rotationMatrix, positi
  * @param rotationMatrix
  * @param position
  */
-vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePosition){
+vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePosition, cameraRotation){
 
 	// Loop through every point - updating the POV-relative coordinates
 	// Also update the distance to furthest / nearest point vars if required
 	for (var i=0; i<this.vertices.length; i++){
-		this.vertices[i].updatePOVCoords(rotationMatrix, relativePosition);
+		this.vertices[i].updatePOVCoords(rotationMatrix, relativePosition, cameraRotation);
 	}
 	
 	// Update the position vertex (helper for locating this object)
-	this.positionVertices.updatePOVCoords(rotationMatrix, relativePosition);
+	this.positionVertices.updatePOVCoords(rotationMatrix, relativePosition, cameraRotation);
 	
 	// Determine if the object is behind the camera or not
 	if(this.positionVertices.povCoords.z>0){
@@ -167,7 +163,7 @@ vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePos
 };
 
 /**
- * Update the view position of each of the vertices in this polygon
+ * Update the view position of each of the vertices in this object
  * @param viewPosition
  */
 vps.WorldObject.prototype.updateViewCoords = function(viewPosition){	

@@ -20,6 +20,11 @@ vps.Polygon.prototype.addVertex = function(vertex){
 	this.vertices[this.vertices.length] = vertex;
 };
 
+vps.Polygon.prototype.clearDistances = function(){
+	this.distanceToFurthestPoint = 0;
+	this.distanceToClosestPoint = Number.POSITIVE_INFINITY;
+}
+
 /**
  * Return whether this polygon is facing the viewport (and thus should be rendered)
  * @returns {Boolean}
@@ -36,29 +41,54 @@ vps.Polygon.prototype.isFacingViewport = function(){
 };
 
 /**
- * Answer whether all the polygon's vertices are close enough to draw
+ * Update the polygon's visibilty flag, based on whether it's inside the view clip,
+ * inside the camera's field of view, and facing the camera
  */
-vps.Polygon.prototype.isInsideViewDistance = function(){
-	var answer = true;
+vps.Polygon.prototype.updateVisibility = function(){
+	this.visible = true;
+	
+	var anyVertexInsideFieldOfView = false;
+	
+	// First updating the distance to the furthest/nearest point of the polygon
 	for(var i=0; i<this.vertices.length; i++){
 		
-		if(this.vertices[i].distanceToCamera > this.distanceToFurthestPoint){
+		if(Math.abs(this.vertices[i].distanceToCamera) > Math.abs(this.distanceToFurthestPoint)){
 			this.distanceToFurthestPoint = this.vertices[i].distanceToCamera;
 		}
 		
-		if(this.vertices[i].distanceToCamera < this.distanceToClosestPoint){
+		if(Math.abs(this.vertices[i].distanceToCamera) < Math.abs(this.distanceToClosestPoint)){
 			this.distanceToClosestPoint = this.vertices[i].distanceToCamera;
 		}
-		
-		// TODO: Pass in max render distance as part of Camera object
-		if(this.vertices[i].distanceToCamera > 50000){
-			answer = false;
+			
+		if(this.vertices[i].insideFieldOfView){
+			anyVertexInsideFieldOfView = true;
 		}
 	}
 	
-	return answer;
+	// If the closest point is outside of the view distance, set poly to invisible
+	if(Math.abs(this.distanceToClosestPoint)>20000){
+		this.visible = false;
+	}
+	
+	// Consider the polygon invisible if no vertex is inside the field of view
+	if(!anyVertexInsideFieldOfView){
+		this.visible = false;
+	}
+
+	// Finally, check if the polygon is actually facing the viewport
+	if(this.visible){
+		
+		// Now check for facing the camera
+		if(!this.isFacingViewport()){
+			this.visible = false;
+		} 
+	}
 };
 
+/**
+ * Answer a unit vector representing the normal to the polygon surface
+ * @returns
+ */
 vps.Polygon.prototype.getNormal = function(){
 	
 	var vector1 = vps.GeometryUtils.createVector3d(this.vertices[0].absoluteCoords,this.vertices[1].absoluteCoords);
@@ -68,16 +98,4 @@ vps.Polygon.prototype.getNormal = function(){
 	answer.normalise();
 	
 	return answer;
-};
-
-vps.Polygon.prototype.getBrightness = function(){
-	var ambient = 0.35;
-	
-	// temp light direction along Z axis
-	var lightVector = new vps.Vector3d(0,0,1);
-	
-	// the raw brightness, 
-	var rawColouring = ambient + (lightVector.dotProduct(this.getNormal())) / (1/ambient);
-	return rawColouring;
-	
 };

@@ -18,6 +18,7 @@ vps.Vertex = function(coords){
 	this.viewCoords = new vps.Coord2d(0,0);			// The position of the vertex on the 2d view plane
 
 	this.distanceToCamera = -1;						// The direct distance from vertex to camera
+	this.insideFieldOfView = false;					// Whether this vertex is in the field of view
 };
 
 /**
@@ -37,11 +38,14 @@ vps.Vertex.prototype.updateAbsoluteCoords = function(transformationMatrix, world
 };
 
 /**
- * Calculate the pov-relative coordinates of the vertex and the distance between pov coords and camera
+ * Calculate:
+ * - the pov-relative coordinates of the vertex 
+ * - the distance between pov coords and camera
+ * - whether the vertext falls inside the camera's field of view
  * @param transformationMatrix
  * @param positionRelativeToView
  */
-vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatrix, cameraPosition){
+vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatrix, cameraPosition, cameraRotation){
 
 	// Work out position with respect to the camera's coordinate system
 	var relativePos = new vps.Coord3d(this.absoluteCoords.x-cameraPosition.x,
@@ -51,19 +55,33 @@ vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatr
 	cameraRotationTransformationMatrix.apply(relativePos, this.povCoords);
 
 	// Work out the distance from camera to this point
-	xDist = relativePos.x - cameraPosition.x;
-	yDist = relativePos.y - cameraPosition.y;
-	zDist = relativePos.z - cameraPosition.z;
+	var xDist = relativePos.x - cameraPosition.x;
+	var yDist = relativePos.y - cameraPosition.y;
+	var zDist = relativePos.z - cameraPosition.z;
 	this.distanceToCamera = Math.sqrt((xDist*xDist) + (yDist*yDist) + (zDist*zDist));
+	
+	// Work out if this vertex is within the camera's field of view 
+	// based on http://nic-gamedev.blogspot.co.uk/2011/11/using-vector-mathematics-and-bit-of.html
+	// TODO: IS THIS REALLY WORKING?
+	var inverseDistance = 1/this.distanceToCamera;
+	var vectorToPoint = new vps.Vector3d(xDist * inverseDistance, yDist * inverseDistance, zDist * inverseDistance);
+	var cameraVector = cameraRotation.toVector();
+	
+	var dotProduct = cameraVector.dotProduct(vectorToPoint);
+	var halfOfFOV = Math.PI/10;
+
+	if(dotProduct >= Math.cos(halfOfFOV)){
+		this.insideFieldOfView = true;
+	} else {
+		this.insideFieldOfView = false;
+	}
+	
 };
 
 /**
  * Calculate the coordinates of the vertex as projected onto the 2d view plane (ie perspectve projection)
  */
 vps.Vertex.prototype.updateViewCoords = function(viewerPostion){
-	
-	//this.viewCoords.x = (this.povCoords.x - viewerPosition.x) * (viewerPosition.z / this.povCoords.z);
-	//this.viewCoords.y = (this.povCoords.y - viewerPosition.y) * (viewerPosition.z / this.povCoords.z);
 	
 	var oneOverZ = 1/this.povCoords.z;
 	this.viewCoords.x = this.povCoords.x * 800 * oneOverZ + 250 ;

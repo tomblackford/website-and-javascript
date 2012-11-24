@@ -23,16 +23,21 @@ vps.ObjectManager.prototype.updateAll = function(camera){
 
 	this.allPolygons = [];
 	
-	// Put all the polygons from all objects into an array
+	// Put all the polygons from all objects into an array first of all 
+	// checking to see if they're outside of the view distance (in which case they can be skipped)
 	for(var i=0; i<this.objects.length; i++){
 		for(var j=0; j<this.objects[i].polygons.length; j++){
-			this.allPolygons[this.allPolygons.length] = this.objects[i].polygons[j];
+			var polygon = this.objects[i].polygons[j];
+			
+			if(polygon.visible) {
+				this.allPolygons[this.allPolygons.length] = polygon;
+			}
 		}
 	}
 	
 	// Order by proximity to the camera
 	this.allPolygons.sort(function(p1, p2){
-		return p2.distanceToFurthestPoint - p1.distanceToFurthestPoint;
+		return Math.abs(p2.distanceToFurthestPoint) - Math.abs(p1.distanceToFurthestPoint);
 	});
 
 	// Update the fps calculator
@@ -46,7 +51,6 @@ vps.ObjectManager.prototype.drawAll = function(sceneRenderer){
 	// Draw them in the right order
 	for(var k=0; k<this.allPolygons.length; k++){
 		if(this.allPolygons[k].parentObject.visible){
-			//this.allPolygons[k].draw(ctx);
 			sceneRenderer.draw(this.allPolygons[k]);
 		}
 	}
