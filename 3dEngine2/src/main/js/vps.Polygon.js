@@ -52,11 +52,11 @@ vps.Polygon.prototype.updateVisibility = function(){
 	// First updating the distance to the furthest/nearest point of the polygon
 	for(var i=0; i<this.vertices.length; i++){
 		
-		if(Math.abs(this.vertices[i].distanceToCamera) > Math.abs(this.distanceToFurthestPoint)){
+		if(this.vertices[i].distanceToCamera > this.distanceToFurthestPoint){
 			this.distanceToFurthestPoint = this.vertices[i].distanceToCamera;
 		}
 		
-		if(Math.abs(this.vertices[i].distanceToCamera) < Math.abs(this.distanceToClosestPoint)){
+		if(this.vertices[i].distanceToCamera < this.distanceToClosestPoint){
 			this.distanceToClosestPoint = this.vertices[i].distanceToCamera;
 		}
 			
@@ -66,7 +66,7 @@ vps.Polygon.prototype.updateVisibility = function(){
 	}
 	
 	// If the closest point is outside of the view distance, set poly to invisible
-	if(Math.abs(this.distanceToClosestPoint)>20000){
+	if(this.distanceToClosestPoint>20000){
 		this.visible = false;
 	}
 	

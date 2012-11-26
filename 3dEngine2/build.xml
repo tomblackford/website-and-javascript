@@ -1,0 +1,27 @@
+<project name="3dEngine" default="upload" basedir=".">
+	<description>
+        ant build for 3d engine
+    </description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+
+	<property name="ftp-server" value="vantagepointsolutions.co.uk" />
+	<property name="ftp-remotedir" value="3d2" />
+	<property name="ftp-userid" value="ftp@vantagepointsolutions.co.uk" />
+	<property name="ftp-password" value="7BdaTAR56G" />
+
+	<target name="upload" description="ftp to web hosting (for mobile testing)">
+		<echo message="Sending all files from ${src}/main/js/"/>
+		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}" userid="${ftp-userid}" password="${ftp-password}" action="send" verbose="yes" depends="yes">
+			<fileset dir="${src}/main/js"  />
+		</ftp>
+		
+		<echo message="Sending test.html"/>
+		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}" userid="${ftp-userid}" password="${ftp-password}" action="send" verbose="yes" depends="yes">
+			<fileset file="./test.html"  />
+		</ftp>
+	</target>
+
+</project>
