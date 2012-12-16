@@ -10,6 +10,7 @@ vps.Polygon = function(hue, reflectivity){
 	this.distanceToClosestPoint = Number.POSITIVE_INFINITY;
 	this.hue = hue;
 	this.reflectivity = reflectivity;
+	this.normal = null;
 };
 
 /**
@@ -20,16 +21,19 @@ vps.Polygon.prototype.addVertex = function(vertex){
 	this.vertices[this.vertices.length] = vertex;
 };
 
-vps.Polygon.prototype.clearDistances = function(){
+vps.Polygon.prototype.clearDerivedState = function(){
 	this.distanceToFurthestPoint = 0;
 	this.distanceToClosestPoint = Number.POSITIVE_INFINITY;
-}
+	this.normal = null;
+};
 
 /**
  * Return whether this polygon is facing the viewport (and thus should be rendered)
  * @returns {Boolean}
  */
-vps.Polygon.prototype.isFacingViewport = function(){
+vps.Polygon.prototype.isFacingViewport = function(camera){
+	
+	// A cheaty way of doing this - seems faster but innaccurate
 	var v1x = this.vertices[2].viewCoords.x - this.vertices[0].viewCoords.x;
 	var v1y = this.vertices[2].viewCoords.y - this.vertices[0].viewCoords.y;	
 	
@@ -38,13 +42,20 @@ vps.Polygon.prototype.isFacingViewport = function(){
 	
 	var z = (v1x * v2y) - (v1y * v2x);
 	return z < 0;
+	
+//	// Try this with the normals - seems more accurate *but slower*
+//	if(this.getNormal().dotProduct(camera.rotation.toVector())>Math.PI/2){
+//		return false;
+//	} else {
+//		return true;
+//	}
 };
 
 /**
  * Update the polygon's visibilty flag, based on whether it's inside the view clip,
  * inside the camera's field of view, and facing the camera
  */
-vps.Polygon.prototype.updateVisibility = function(){
+vps.Polygon.prototype.updateVisibility = function(camera){
 	this.visible = true;
 	
 	var anyVertexInsideFieldOfView = false;
@@ -79,7 +90,7 @@ vps.Polygon.prototype.updateVisibility = function(){
 	if(this.visible){
 		
 		// Now check for facing the camera
-		if(!this.isFacingViewport()){
+		if(!this.isFacingViewport(camera)){
 			this.visible = false;
 		} 
 	}
@@ -90,12 +101,17 @@ vps.Polygon.prototype.updateVisibility = function(){
  * @returns
  */
 vps.Polygon.prototype.getNormal = function(){
+	var answer = this.normal;
 	
-	var vector1 = vps.GeometryUtils.createVector3d(this.vertices[0].absoluteCoords,this.vertices[1].absoluteCoords);
-	var vector2 = vps.GeometryUtils.createVector3d(this.vertices[1].absoluteCoords,this.vertices[2].absoluteCoords);
-	
-	var answer = vector1.crossProduct(vector2);
-	answer.normalise();
+	if(answer == null){
+		var vector1 = vps.GeometryUtils.createVector3d(this.vertices[0].absoluteCoords,this.vertices[1].absoluteCoords);
+		var vector2 = vps.GeometryUtils.createVector3d(this.vertices[1].absoluteCoords,this.vertices[2].absoluteCoords);
+		
+		answer = vector1.crossProduct(vector2);
+		answer.normalise();
+		
+		this.normal = answer;
+	}
 	
 	return answer;
 };

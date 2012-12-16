@@ -15,7 +15,10 @@ vps.SceneRenderer = function(ctx, camera, shader){
  * @param ctx
  */
 vps.SceneRenderer.prototype.draw = function(polygon){
-
+	// Draw the vertices
+	//this.ctx.fillStyle = '#ffffff';
+	//ctx.fillRect(polygon.vertices[0].viewCoords.x, polygon.vertices[0].viewCoords.y, 3, 3);
+	
 	if(polygon.visible){
 
 		this.ctx.fillStyle = shader.shade(polygon);
@@ -32,6 +35,7 @@ vps.SceneRenderer.prototype.draw = function(polygon){
 		
 		this.ctx.closePath();
 		this.ctx.fill();
+		// this.ctx.stroke();
 	}
 	
 };

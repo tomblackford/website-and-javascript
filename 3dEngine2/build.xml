@@ -12,14 +12,15 @@
 	<property name="ftp-userid" value="ftp@vantagepointsolutions.co.uk" />
 	<property name="ftp-password" value="7BdaTAR56G" />
 
+	<!-- Upload the JS src files and test html file for mobile testing -->
 	<target name="upload" description="ftp to web hosting (for mobile testing)">
 		<echo message="Sending all files from ${src}/main/js/"/>
-		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}" userid="${ftp-userid}" password="${ftp-password}" action="send" verbose="yes" depends="yes">
+		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}/src/main/js" userid="${ftp-userid}" password="${ftp-password}" action="put" verbose="yes" depends="yes" newer="false">
 			<fileset dir="${src}/main/js"  />
 		</ftp>
 		
 		<echo message="Sending test.html"/>
-		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}" userid="${ftp-userid}" password="${ftp-password}" action="send" verbose="yes" depends="yes">
+		<ftp server="${ftp-server}" remotedir="${ftp-remotedir}" userid="${ftp-userid}" password="${ftp-password}" action="send" verbose="yes" depends="yes" newer="false">
 			<fileset file="./test.html"  />
 		</ftp>
 	</target>

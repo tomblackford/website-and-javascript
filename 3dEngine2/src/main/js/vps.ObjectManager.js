@@ -19,6 +19,8 @@ vps.ObjectManager.prototype.addObject = function(newObject){
  */
 vps.ObjectManager.prototype.updateAll = function(camera){
 	
+	vps.Timer.start('ObjectManager.updateAll');
+	
 	// TODO: THIS WILL PROBABLY GET FACTORED INTO SOME KIND OF GAME-MANAGER 
 	for(var i=0; i<this.objects.length; i++){
 		// console.log('Updating object '+i);
@@ -32,7 +34,7 @@ vps.ObjectManager.prototype.updateAll = function(camera){
 	for(var i=0; i<this.objects.length; i++){
 		for(var j=0; j<this.objects[i].polygons.length; j++){
 			var polygon = this.objects[i].polygons[j];
-			
+
 			// 'visible' will already have been set by the update
 			if(polygon.visible) {
 				this.allPolygons[this.allPolygons.length] = polygon;
@@ -49,6 +51,8 @@ vps.ObjectManager.prototype.updateAll = function(camera){
 	this.thisFrameFPS = 1000 / ((this.now=new Date) - this.lastUpdate);
 	this.fps += (this.thisFrameFPS - this.fps) / this.fpsFilter;
 	this.lastUpdate = this.now;
+	
+	vps.Timer.end('ObjectManager.updateAll');
 };
 
 /**
@@ -56,11 +60,14 @@ vps.ObjectManager.prototype.updateAll = function(camera){
  * @param sceneRenderer
  */
 vps.ObjectManager.prototype.drawAll = function(sceneRenderer){
-
+	vps.Timer.start('ObjectManager.drawAll');
+	
 	// Draw them in the right order
 	for(var k=0; k<this.allPolygons.length; k++){
 		if(this.allPolygons[k].parentObject.visible){
 			sceneRenderer.draw(this.allPolygons[k]);
 		}
 	}
+	
+	vps.Timer.end('ObjectManager.drawAll');
 };

@@ -4,11 +4,11 @@ vps.worldobjects = vps.worldobjects || {};
 /**
  * A cube
  */
-vps.worldobjects.Cube = function(name, hue, reflectivity){
+vps.worldobjects.Cube = function(name, size, hue, reflectivity){
 	// Call parent constructor
 	vps.worldobjects.Cube.baseConstructor.call(this, name);
 	
-	var sp = 10;
+	var sp = size; 
 
 	// Some vertices for this object
 	this.addVertexByCoords(-sp, -sp,  sp);		// 0

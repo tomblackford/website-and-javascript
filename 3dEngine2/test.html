@@ -18,10 +18,12 @@
 		<script type="text/javascript" src="src/main/js/vps.ObjectManager.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Camera.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.FlatShader.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.Timer.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.SceneRenderer.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.WorldObject.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.worldobjects.Cube.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.worldobjects.Coriolis.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.worldobjects.Checkerboard.js"></script>
 	</head>
 	<body>
 		<canvas id="canvas" height="500" width="500" style="background-color: black;"></canvas>
@@ -51,6 +53,17 @@
 					<td>
 						+ / -
 					</td>
+				</tr>
+			</table>
+			
+			<table>
+				<tr>
+					<th>ObjectManager.updateAll</th>
+					<td><div id="timerObjectManagerUpdateAll"></div></td>
+				</tr>
+				<tr>
+					<th>ObjectManager.drawAll</th>
+					<td><div id="timerObjectManagerDrawAll"></div></td>
 				</tr>
 			</table>
 		</div>
@@ -106,11 +119,11 @@
 			var hue = 0;
 			var count = 0;
 			
-			for (var i=-800; i<=800; i+=400){
+			for (var i=-800; i<=800; i+=800){
 				hue = 0;			
-				for(var j=-800; j<=800; j+=400){
+				for(var j=-800; j<=800; j+=800){
 					
-					for(var k=-800; k<=800; k+=400){
+					for(var k=-800; k<=800; k+=800){
 						var cube1 = new vps.worldobjects.Coriolis('coriolis_'+i+'_'+j+'_'+k, hue, 0.5);
 						cube1.rotation = new vps.Rotation(0,0,0);
 						
@@ -134,11 +147,16 @@
 				++count;
 			}
 			
-			//var cube1 = new vps.worldobjects.Cube('coriolis', 120, 0.5);
-			//cube1.rotation = new vps.Rotation(0,0,0);
-			//cube1.rotationSpeed = new vps.Rotation(0, oneDegree, 0);
-			//cube1.position = new vps.Coord3d(0,0,0);
-			//objectManager.addObject(cube1);
+			var checkerboard = new vps.worldobjects.Checkerboard('floor', 500, 41, 41, 20, 120, 0.5);
+			checkerboard.position = new vps.Coord3d(0,-2000,0);
+			checkerboard.rotation = new vps.Rotation(0,0,0);
+			objectManager.addObject(checkerboard);
+			
+// 			var cube1 = new vps.worldobjects.Cube('CUBE', 350, 120, 0.5);
+// 			cube1.rotation = new vps.Rotation(0,0,0);
+// 			cube1.rotationSpeed = new vps.Rotation(oneDegree, oneDegree, oneDegree);
+// 			cube1.position = new vps.Coord3d(0,0,0);
+// 			objectManager.addObject(cube1);
 
 			// A camera object
 			var cameraPosition = new vps.Coord3d(0,0,+4000);	// A bit back from origin
@@ -154,20 +172,28 @@
 			// A scene renderer
 			var sceneRenderer = new vps.SceneRenderer(ctx, camera, shader);
 			
-			// This is the body of the 'game loop'
-			var updateAndDraw = function () {
-
-				objectManager.updateAll(camera);
-				objectManager.drawAll(sceneRenderer);
-
-			};
-			
 			// Elements for debug readout
 			var fpsOut = document.getElementById('fps');
 			var cameraPositionOut = document.getElementById('cameraPosition');
 			var cameraRotationOut = document.getElementById('cameraRotation');
 			var lightVectorOut = document.getElementById('lightVector');
 			var ambientLightOut = document.getElementById('ambientLight');
+			
+			var timerObjectManagerUpdateAllOut = document.getElementById('timerObjectManagerUpdateAll');
+			var timerObjectManagerDrawAllOut = document.getElementById('timerObjectManagerDrawAll');
+			
+			
+			// This is the body of the 'game loop'
+			var updateAndDraw = function () {
+
+				objectManager.updateAll(camera);
+				objectManager.drawAll(sceneRenderer);
+				
+				timerObjectManagerUpdateAllOut.innerHTML = vps.Timer.getTime('ObjectManager.updateAll');
+				timerObjectManagerDrawAllOut.innerHTML = vps.Timer.getTime('ObjectManager.drawAll');
+
+			};
+			
 			
 			cameraRotationOut.innerHTML = cameraRotation.toString();
 			cameraPositionOut.innerHTML = cameraPosition.toString();
@@ -195,29 +221,29 @@
 				// Turning left and right
 				if(key==39){
 					cameraRotation.y -= oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
 				}
 				if(key==188){
 					cameraRotation.y -= 90*oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
 				}
 				if(key==190){
 					cameraRotation.y += 90*oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
 				}
 				if(key==37){
 					cameraRotation.y += oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
 				}
 				
 				// Looking up and down
 				if(key==38){
 					cameraRotation.x += oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
 				}
 				if(key==40){
 					cameraRotation.x -= oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
 				}
 				
 				// Move the camera in the direction it's facing

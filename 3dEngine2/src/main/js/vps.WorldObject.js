@@ -86,18 +86,34 @@ vps.WorldObject.prototype.update = function(camera){
 	
 	// Clear any cached distances from each polygon
 	for(var i=0; i<this.polygons.length; i++){
-		this.polygons[i].clearDistances();
+		this.polygons[i].clearDerivedState();
 	}
 	
 	// Update the object's rotation based on its rotation speed
+	// If we're past 360 degrees, reduce by 360 degrees and vice versa
 	this.rotation.x += this.rotationSpeed.x;
 	this.rotation.x = Math.round(this.rotation.x*100)/100;
+	if(this.rotation.x > Math.PI*2){
+		this.rotation.x -= Math.PI*2;
+	} else if (this.rotation.x < -Math.PI*2){
+		this.rotation.x += Math.PI*2;
+	}
 	
 	this.rotation.y += this.rotationSpeed.y;
 	this.rotation.y = Math.round(this.rotation.y*100)/100;
+	if(this.rotation.y > Math.PI*2){
+		this.rotation.y -= Math.PI*2;
+	} else if (this.rotation.y < -Math.PI*2){
+		this.rotation.y += Math.PI*2;
+	}
 	
 	this.rotation.z += this.rotationSpeed.z;
 	this.rotation.z = Math.round(this.rotation.z*100)/100;
+	if(this.rotation.z > Math.PI*2){
+		this.rotation.z -= Math.PI*2;
+	} else if (this.rotation.z < -Math.PI*2){
+		this.rotation.z += Math.PI*2;
+	}
 	
 	// Rotation transformations based on the camera position, rotation and viewer position
 	var worldRotationTransformation = vps.RotationTransformationFactory.getRotationTransformationMatrix(this.rotation);
@@ -117,7 +133,7 @@ vps.WorldObject.prototype.update = function(camera){
 		
 		// Work out whether each polygon needs to be rendered
 		for(var i=0; i<this.polygons.length; i++){		
-			this.polygons[i].updateVisibility();
+			this.polygons[i].updateVisibility(camera);
 		};
 	} 
 };

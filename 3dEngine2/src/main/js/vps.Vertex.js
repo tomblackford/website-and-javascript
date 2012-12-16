@@ -55,9 +55,10 @@ vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatr
 	cameraRotationTransformationMatrix.apply(relativePos, this.povCoords);
 
 	// Work out the distance from camera to this point
-	var xDist = relativePos.x - cameraPosition.x;
-	var yDist = relativePos.y - cameraPosition.y;
-	var zDist = relativePos.z - cameraPosition.z;
+	var xDist = this.absoluteCoords.x - cameraPosition.x;
+	var yDist = this.absoluteCoords.y - cameraPosition.y;
+	var zDist = this.absoluteCoords.z - cameraPosition.z;
+	
 	this.distanceToCamera = Math.abs(Math.sqrt((xDist*xDist) + (yDist*yDist) + (zDist*zDist)));
 	
 	// Work out if this vertex is within the camera's field of view 
@@ -68,7 +69,7 @@ vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatr
 	var cameraVector = cameraRotation.toVector();
 	
 	var dotProduct = cameraVector.dotProduct(vectorToPoint);
-	var halfOfFOV = Math.PI/10;
+	var halfOfFOV = Math.PI/7;
 
 	if(dotProduct >= Math.cos(halfOfFOV)){
 		this.insideFieldOfView = true;
@@ -87,4 +88,8 @@ vps.Vertex.prototype.updateViewCoords = function(viewerPostion){
 	this.viewCoords.x = this.povCoords.x * 800 * oneOverZ + 250 ;
 	this.viewCoords.y = -this.povCoords.y * 800 * oneOverZ + 250 ;
 
+};
+
+vps.Vertex.prototype.toString = function(){
+	return "Vertex ("+this.relativeCoords+")";
 };
