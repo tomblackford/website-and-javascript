@@ -17,6 +17,9 @@
 		<script type="text/javascript" src="src/main/js/vps.Polygon4.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.ObjectManager.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Camera.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.lights.Light.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.lights.DirectionalLight.js"></script>
+		<script type="text/javascript" src="src/main/js/vps.lights.OmniLight.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.FlatShader.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.Timer.js"></script>
 		<script type="text/javascript" src="src/main/js/vps.SceneRenderer.js"></script>
@@ -26,84 +29,148 @@
 		<script type="text/javascript" src="src/main/js/vps.worldobjects.Checkerboard.js"></script>
 	</head>
 	<body>
+
 		<canvas id="canvas" height="500" width="500" style="background-color: black;"></canvas>
 		
-		<div style="float:right;">
-			<table>
-				<tr>
-					<th>Rotate Camera :</th>
-					<td>
-						arrow keys
-					</td>
-				</tr>
-				<tr>
-					<th>Move forward / backwards :</th>
-					<td>
-						a / z
-					</td>
-				</tr>
-				<tr>
-					<th>Light Direction :</th>
-					<td>
-						1 to 9
-					</td>
-				</tr>
-				<tr>
-					<th>Ambient Light increase / decrease :</th>
-					<td>
-						+ / -
-					</td>
-				</tr>
-			</table>
-			
-			<table>
-				<tr>
-					<th>ObjectManager.updateAll</th>
-					<td><div id="timerObjectManagerUpdateAll"></div></td>
-				</tr>
-				<tr>
-					<th>ObjectManager.drawAll</th>
-					<td><div id="timerObjectManagerDrawAll"></div></td>
-				</tr>
-			</table>
-		</div>
 		<style>
-			th {
+			body, td, td {
+				font-family: arial, helvetica, sans-serif;
+				font-size: 10px;
+			}
+			
+			table {
+				border-collapse:collapse;
+				border: 1px solid #dddddd;
+			}
+			
+			table.info {
+				width: 500px;
+				margin: 10px;
+			}
+			
+			tbody th {
+				background-color: #fafafa;
 				text-align: right;
+				width: 30%;
+			}
+			
+			thead th {
+				background-color: #eeeeee;
+				text-align: center;
+			}
+			
+			td {
+				border: 1px solid #dddddd;
+				width: 70%;
 			}
 		</style>
-		<table>
-			<tr>
-				<th>Frames / second :</th>
-				<td>
-					<div id="fps"></div>
-				</td>
-			</tr>
-			<tr>
-				<th>Camera Position :</th>
+		
+		
+		
+		<div style="float:right;">
+			<table class="info">
+				<thead>
+					<tr>
+						<th colspan="2">Controls</th>	
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th>Rotate Camera</th>
+						<td>
+							arrow keys
+						</td>
+					</tr>
+					<tr>
+						<th>Move forward / backwards</th>
+						<td>
+							a / z
+						</td>
+					</tr>
+					<tr>
+						<th>Light Direction</th>
+						<td>
+							1 to 9
+						</td>
+					</tr>
+					<tr>
+						<th>Ambient Light increase / decrease</th>
+						<td>
+							+ / -
+						</td>
+					</tr>
+					<tr>
+						<th>Toggle show vertices</th>
+						<td>
+							v
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+					<table class="info">
+			<thead>
+				<tr>
+					<th colspan="2">Current State</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+				<th>Camera Position</th>
 				<td>
 					<div id="cameraPosition"></div>
 				</td>
 			</tr>
 			<tr>
-				<th>Camera Rotation :</th>
+				<th>Camera Rotation</th>
 				<td>
 					<div id="cameraRotation"></div>
 				</td>
 			</tr>
 			<tr>
-				<th>Light Direction :</th>
-				<td>
-					<div id="lightVector"></div>
-				</td>
-			</tr>
-			<tr>
-				<th>Ambient Light :</th>
+				<th>Ambient Light</th>
 				<td>
 					<div id="ambientLight"></div>
 				</td>
 			</tr>
+			<tr>
+				<th>Omni Light Position</th>
+				<td>
+					<div id="omniLight"></div>
+				</td>
+			</tr>
+			</tbody>
+			
 		</table>
+		
+			<table class="info">
+				<thead>
+					<tr>
+						<th colspan="3">Performance stats</th>	
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th>Frames / second</th>
+						<td>
+							<div id="fps"></div>
+						</td>
+					</tr>
+					<tr>
+						<th>ObjectManager.updateAll</th>
+						<td><div id="timerObjectManagerUpdateAll"></div></td>
+					</tr>
+					<tr>
+						<th>ObjectManager.drawAll</th>
+						<td><div id="timerObjectManagerDrawAll"></div></td>
+					</tr>
+					<tr>
+						<th>Drawn polygon count</th>
+						<td><div id="drawnPolygonCount"></div></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 		
 		<script>
 			var canvas = document.querySelector('canvas');
@@ -147,8 +214,8 @@
 				++count;
 			}
 			
-			var checkerboard = new vps.worldobjects.Checkerboard('floor', 500, 41, 41, 20, 120, 0.5);
-			checkerboard.position = new vps.Coord3d(0,-2000,0);
+			var checkerboard = new vps.worldobjects.Checkerboard('floor', 200, 41, 41, 10, 120, 0.2);
+			checkerboard.position = new vps.Coord3d(0,-1000,0);
 			checkerboard.rotation = new vps.Rotation(0,0,0);
 			objectManager.addObject(checkerboard);
 			
@@ -165,9 +232,12 @@
 			var camera = new vps.Camera (cameraPosition, cameraRotation, viewerPosition);
 			
 			// A shader
-			var lightVector = new vps.Vector3d(-1, -1, 0);
-			var ambientLight = 0.5;
-			var shader = new vps.FlatShader(lightVector, ambientLight);
+			var shader = new vps.FlatShader();
+			
+			// Some lights 
+			var omniLight = new vps.lights.OmniLight("omni", 5.0, new vps.Coord3d(0, 0, 0), 3000);
+			var ambientLight = new vps.lights.Light("ambient", 0);
+			var lights = [ambientLight, omniLight];
 			
 			// A scene renderer
 			var sceneRenderer = new vps.SceneRenderer(ctx, camera, shader);
@@ -176,8 +246,9 @@
 			var fpsOut = document.getElementById('fps');
 			var cameraPositionOut = document.getElementById('cameraPosition');
 			var cameraRotationOut = document.getElementById('cameraRotation');
-			var lightVectorOut = document.getElementById('lightVector');
 			var ambientLightOut = document.getElementById('ambientLight');
+			var omniLightOut = document.getElementById('omniLight');
+			var drawnPolygonCountOut = document.getElementById('drawnPolygonCount');
 			
 			var timerObjectManagerUpdateAllOut = document.getElementById('timerObjectManagerUpdateAll');
 			var timerObjectManagerDrawAllOut = document.getElementById('timerObjectManagerDrawAll');
@@ -187,25 +258,27 @@
 			var updateAndDraw = function () {
 
 				objectManager.updateAll(camera);
-				objectManager.drawAll(sceneRenderer);
+				var drawnPolyCount = objectManager.drawAll(sceneRenderer, lights);
+				
+				drawnPolygonCountOut.innerHTML = drawnPolyCount;
 				
 				timerObjectManagerUpdateAllOut.innerHTML = vps.Timer.getTime('ObjectManager.updateAll');
 				timerObjectManagerDrawAllOut.innerHTML = vps.Timer.getTime('ObjectManager.drawAll');
-
+				
 			};
 			
 			
 			cameraRotationOut.innerHTML = cameraRotation.toString();
 			cameraPositionOut.innerHTML = cameraPosition.toString();
-			lightVectorOut.innerHTML = lightVector.toString();
-			ambientLightOut.innerHTML = ambientLight;
+			ambientLightOut.innerHTML = ambientLight.toString();
+			omniLightOut.innerHTML = omniLight.toString();
 			
 			// Calculate FPS every second
-			setInterval(function(){
-			  
+			setInterval(function(){ 
 				var fps = objectManager.fps.toFixed(1);
-				fpsOut.innerHTML = fps;
-			  
+				fpsOut.innerHTML = fps; 
+				console.log(omniLight.position);
+				
 			}, 2000); 
 			
 			// Update screen 30x per second
@@ -221,29 +294,29 @@
 				// Turning left and right
 				if(key==39){
 					cameraRotation.y -= oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				if(key==188){
 					cameraRotation.y -= 90*oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				if(key==190){
 					cameraRotation.y += 90*oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				if(key==37){
 					cameraRotation.y += oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				
 				// Looking up and down
 				if(key==38){
 					cameraRotation.x += oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				if(key==40){
 					cameraRotation.x -= oneDegree;
-					cameraRotationOut.innerHTML = cameraRotation.toString() + "|" + cameraRotation.toVector().toString();
+					cameraRotationOut.innerHTML = cameraRotation.toString();
 				}
 				
 				// Move the camera in the direction it's facing
@@ -258,47 +331,52 @@
 				
 				// Change lighting direction
 				if(key==49){
-					shader.lightVector = new vps.Vector3d(0, 0, 1);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(0, 0, 1);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				if(key==50){
-					shader.lightVector = new vps.Vector3d(0, 1, 0);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(0, 1, 0);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				if(key==51){
-					shader.lightVector = new vps.Vector3d(1, 0, 0);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(1, 0, 0);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				if(key==52){
-					shader.lightVector = new vps.Vector3d(1, 0, 1);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(1, 0, 1);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				if(key==53){
-					shader.lightVector = new vps.Vector3d(1, 1, 1);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(1, 1, 1);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				if(key==54){
-					shader.lightVector = new vps.Vector3d(-1, -1, 1);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(-1, -1, 1);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				if(key==55){
-					shader.lightVector = new vps.Vector3d(-1, -1, 1);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(-1, -1, 1);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				if(key==56){
-					shader.lightVector = new vps.Vector3d(1, 0, -1);
-					lightVectorOut.innerHTML = shader.lightVector.toString();
+					directionalLight.vectorDirection = new vps.Vector3d(1, 0, -1);
+					lightVectorOut.innerHTML = directionalLight.vectorDirection.toString();
 				}
 				
 				
 				// Change the ambient light level
-				if(key==173){
-					shader.ambientLight -= 0.1;
-					ambientLightOut.innerHTML = shader.ambientLight;
+				if(key==173 || key==189){
+					ambientLight.brightness -= 0.1;
+					ambientLightOut.innerHTML = ambientLight.brightness;
 				}
-				if(key==61){
-					shader.ambientLight += 0.1;
-					ambientLightOut.innerHTML = shader.ambientLight;
+				if(key==61 || key==187){
+					ambientLight.brightness += 0.1;
+					ambientLightOut.innerHTML = ambientLight.brightness;
+				}
+				
+				// Toggle drawing of vertices
+				if(key==86){
+					sceneRenderer.drawVertices = !sceneRenderer.drawVertices;
 				}
 				
 				console.log(key);

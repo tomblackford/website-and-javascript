@@ -32,9 +32,33 @@ vps.GeometryUtils = function(){
 		return new vps.Vector3d(x,y,z);
 	};
 	
+	/**
+	 * Answer the distance between the two passed coords
+	 */
+	var distanceBetween = function(coord1, coord2){
+
+		return vectorBetween(coord1, coord2).distance();
+		
+	};
+	
+	/**
+	 * Answer the vector between the two points
+	 */
+	var vectorBetween = function(coord1, coord2){
+		
+		var xDist = coord1.x - coord2.x;
+		var yDist = coord1.y - coord2.y;
+		var zDist = coord1.z - coord2.z;
+		//console.log(yDist);
+		var answer = new vps.Vector3d(xDist, yDist, zDist);
+		return answer;	
+	};
+	
 	return {
 		moveInFacingDirection : moveInFacingDirection,
-		createVector3d : createVector3d
+		createVector3d : createVector3d,
+		distanceBetween : distanceBetween,
+		vectorBetween : vectorBetween
 	};
 
 }();

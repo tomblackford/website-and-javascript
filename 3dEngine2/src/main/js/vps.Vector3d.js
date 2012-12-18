@@ -33,6 +33,10 @@ vps.Vector3d.prototype.normalise = function(){
 	this.z = this.z/length;
 };
 
+vps.Vector3d.prototype.distance = function(){
+	return Math.abs(Math.sqrt((this.x*this.x) + (this.y*this.y) + (this.z*this.z)));
+};
+
 vps.Vector3d.prototype.toString = function(){
 	return "Vector3d ("+this.x+", "+this.y+", "+this.z+")";
 };

@@ -54,18 +54,14 @@ vps.Vertex.prototype.updatePOVCoords = function(cameraRotationTransformationMatr
 	
 	cameraRotationTransformationMatrix.apply(relativePos, this.povCoords);
 
-	// Work out the distance from camera to this point
-	var xDist = this.absoluteCoords.x - cameraPosition.x;
-	var yDist = this.absoluteCoords.y - cameraPosition.y;
-	var zDist = this.absoluteCoords.z - cameraPosition.z;
-	
-	this.distanceToCamera = Math.abs(Math.sqrt((xDist*xDist) + (yDist*yDist) + (zDist*zDist)));
+	var distanceVector = vps.GeometryUtils.vectorBetween(this.absoluteCoords, cameraPosition);
+	this.distanceToCamera = distanceVector.distance();
 	
 	// Work out if this vertex is within the camera's field of view 
 	// based on http://nic-gamedev.blogspot.co.uk/2011/11/using-vector-mathematics-and-bit-of.html
 	// TODO: IS THIS REALLY WORKING?
 	var inverseDistance = 1/this.distanceToCamera;
-	var vectorToPoint = new vps.Vector3d(xDist * inverseDistance, yDist * inverseDistance, zDist * inverseDistance);
+	var vectorToPoint = new vps.Vector3d(distanceVector.x * inverseDistance, distanceVector.y * inverseDistance, distanceVector.z * inverseDistance);
 	var cameraVector = cameraRotation.toVector();
 	
 	var dotProduct = cameraVector.dotProduct(vectorToPoint);

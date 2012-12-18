@@ -12,7 +12,7 @@ vps = vps || {};
 vps.WorldObject = function(name){
 	this.vertices = [];
 	this.polygons = [];
-	this.visible = false;
+	this.visible = true;
 	this.name = name;
 
 	// Position and speed of the object
@@ -168,13 +168,6 @@ vps.WorldObject.prototype.updatePovCoords = function(rotationMatrix, relativePos
 	
 	// Update the position vertex (helper for locating this object)
 	this.positionVertices.updatePOVCoords(rotationMatrix, relativePosition, cameraRotation);
-	
-	// Determine if the object is behind the camera or not
-	if(this.positionVertices.povCoords.z>0){
-		this.visible = true;
-	} else {
-		this.visible = false;
-	};
 	
 };
 

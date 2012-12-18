@@ -59,15 +59,18 @@ vps.ObjectManager.prototype.updateAll = function(camera){
  * Draw all the objects in the scene using the passed renderer
  * @param sceneRenderer
  */
-vps.ObjectManager.prototype.drawAll = function(sceneRenderer){
+vps.ObjectManager.prototype.drawAll = function(sceneRenderer, lights){
 	vps.Timer.start('ObjectManager.drawAll');
+	
+	var drawnCount = 0;
 	
 	// Draw them in the right order
 	for(var k=0; k<this.allPolygons.length; k++){
 		if(this.allPolygons[k].parentObject.visible){
-			sceneRenderer.draw(this.allPolygons[k]);
+			var polyDrawn = sceneRenderer.draw(this.allPolygons[k], lights);
+			if(polyDrawn) ++drawnCount;	
 		}
 	}
-	
 	vps.Timer.end('ObjectManager.drawAll');
+	return drawnCount;
 };

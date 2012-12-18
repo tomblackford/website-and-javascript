@@ -11,6 +11,7 @@ vps.Polygon = function(hue, reflectivity){
 	this.hue = hue;
 	this.reflectivity = reflectivity;
 	this.normal = null;
+	this.midpointPosition = null;
 };
 
 /**
@@ -25,6 +26,7 @@ vps.Polygon.prototype.clearDerivedState = function(){
 	this.distanceToFurthestPoint = 0;
 	this.distanceToClosestPoint = Number.POSITIVE_INFINITY;
 	this.normal = null;
+	this.midpointPosition = null;
 };
 
 /**
@@ -97,7 +99,9 @@ vps.Polygon.prototype.updateVisibility = function(camera){
 };
 
 /**
- * Answer a unit vector representing the normal to the polygon surface
+ * Answer a unit vector representing the normal to the polygon surface.
+ * Calculated lazily each frame.
+ * COULD CACHE THIS IF POLYGON HASN'T MOVED
  * @returns
  */
 vps.Polygon.prototype.getNormal = function(){
@@ -111,6 +115,34 @@ vps.Polygon.prototype.getNormal = function(){
 		answer.normalise();
 		
 		this.normal = answer;
+	}
+	
+	return answer;
+};
+
+/**
+ * Answer a Coord3d representing the midpoint of the polygon surface.
+ * Calculated lazily each frame.
+ * COULD CACHE THIS IF THE POLYGON HASN'T MOVED
+ * @returns
+ */
+vps.Polygon.prototype.getMidpointPosition = function(){
+	var answer = this.midpointPosition;
+	
+	if(answer == null){
+		var x = 0;
+		var y = 0;
+		var z = 0;
+		
+		for(var i=0; i<this.vertices.length; i++){
+			x += this.vertices[i].absoluteCoords.x;
+			y += this.vertices[i].absoluteCoords.y;
+			z += this.vertices[i].absoluteCoords.z;
+		}
+		
+		answer = new vps.Coord3d(x/this.vertices.length, y/this.vertices.length, z/this.vertices.length);
+		
+		this.midpointPosition = answer;
 	}
 	
 	return answer;
