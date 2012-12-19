@@ -88,13 +88,7 @@
 						</td>
 					</tr>
 					<tr>
-						<th>Light Direction</th>
-						<td>
-							1 to 9
-						</td>
-					</tr>
-					<tr>
-						<th>Ambient Light increase / decrease</th>
+						<th>Ambient Light + / -</th>
 						<td>
 							+ / -
 						</td>
@@ -214,7 +208,7 @@
 				++count;
 			}
 			
-			var checkerboard = new vps.worldobjects.Checkerboard('floor', 200, 41, 41, 10, 120, 0.2);
+			var checkerboard = new vps.worldobjects.Checkerboard('floor', 200, 41, 41, 5, 120, 0.2);
 			checkerboard.position = new vps.Coord3d(0,-1000,0);
 			checkerboard.rotation = new vps.Rotation(0,0,0);
 			objectManager.addObject(checkerboard);
