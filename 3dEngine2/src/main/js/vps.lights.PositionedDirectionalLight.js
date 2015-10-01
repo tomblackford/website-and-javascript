@@ -2,7 +2,7 @@ vps = vps || {};
 vps.lights = vps.lights || {};
 
 /**
- * A directional light eminating from a particular position 
+ * A directional light emanating from a particular position - ie a spotlight
  */
 vps.lights.PositionedDirectionalLight = function(name, brightness, vectorDirection, position){
 	
@@ -24,7 +24,7 @@ vps.Utils.extend(vps.lights.PositionedDirectionalLight, vps.lights.DirectionalLi
 vps.lights.PositionedDirectionalLight.prototype.getPolygonBrightness = function(polygon){
 	var polyBrightness = vps.lights.PositionedDirectionalLight.superClass.getPolygonBrightness(polygon);
 	
-	//
+	//TODO Wow this feels like it might be tricky!
 	
 	
 	return polyBrightness;

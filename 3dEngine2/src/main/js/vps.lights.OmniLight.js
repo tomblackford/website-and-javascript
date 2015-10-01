@@ -26,11 +26,14 @@ vps.lights.OmniLight.prototype.getBrightness = function(polygon){
 	var polyBrightness = vps.lights.OmniLight.superClass.getBrightness.call(this,polygon);
 	var polygonMidpointPosition = polygon.getMidpointPosition();
 
+	var distanceVector = vps.GeometryUtils.vectorBetween(polygonMidpointPosition, this.position);
+
 	// Apply 3 multipliers - the distance from the light, the angle to the light and 
 	// the surface's reflectivity
-	polyBrightness = polyBrightness * this.getRangeMultiplier(polygonMidpointPosition);
+	polyBrightness = polyBrightness * this.getRangeMultiplier(polygonMidpointPosition, distanceVector);
 	if(polyBrightness>0){
-		polyBrightness = polyBrightness * this.getDirectionalMultiplier(polygonMidpointPosition, polygon.getNormal());
+		distanceVector.normalise();
+		polyBrightness = polyBrightness * this.getDirectionalMultiplier(polygonMidpointPosition, polygon.getNormal(), distanceVector);
 	}
 	if(polyBrightness>0){
 		polyBrightness = polyBrightness * polygon.reflectivity;
@@ -43,13 +46,9 @@ vps.lights.OmniLight.prototype.getBrightness = function(polygon){
  * polygon is facing the light source. Should be between 1 (polygon facing 
  * directly at light) and 0 polygon is facing completely opposite direction.
  */
-vps.lights.OmniLight.prototype.getDirectionalMultiplier = function (polygonMidpointPosition, polygonNormal){
+vps.lights.OmniLight.prototype.getDirectionalMultiplier = function (polygonMidpointPosition, polygonNormal, distanceVector){
 	var answer = 0;
-	
-	//TODO : we shouldn't need to calculate this twice (here & in function below)
-	var distanceVector = vps.GeometryUtils.vectorBetween(polygonMidpointPosition, this.position);
-	distanceVector.normalise();
-	
+
 	// Decay the distance based on angle of poly to light
 	answer = distanceVector.dotProduct(polygonNormal);
 	if(answer<0){
@@ -63,11 +62,8 @@ vps.lights.OmniLight.prototype.getDirectionalMultiplier = function (polygonMidpo
  * between the polygon and the light source. Should be between 1 (polygon on
  * top of light) and 0 polygon is outside range of light.
  */
-vps.lights.OmniLight.prototype.getRangeMultiplier = function (polygonMidpointPosition){
+vps.lights.OmniLight.prototype.getRangeMultiplier = function (polygonMidpointPosition, distanceVector){
 	var answer = 0;
-	
-	//TODO : we shouldn't need to calculate this twice (here & in function below)
-	var distanceVector = vps.GeometryUtils.vectorBetween(polygonMidpointPosition, this.position);
 	
 	var distanceToPoly = distanceVector.distance();
 	var diff = (this.range) - distanceToPoly;
